@@ -16,7 +16,6 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  console.log('DynamicBackground render - enabled:', settings?.enabled, 'image:', !!backgroundImage, 'error:', imageError, 'loading:', loading);
 
   useEffect(() => {
     loadBackgroundSettings();
@@ -106,7 +105,6 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
     );
   }
 
-  console.log('Rendering ImageBackground with URL:', backgroundImage.url);
   
   return (
     <View style={styles.container}>
@@ -128,24 +126,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
           setImageError(false);
         }}
       >
-        {settings.blur > 0 && Platform.OS !== 'web' && (
-          <BlurView
-            intensity={settings.blur}
-            style={styles.blurOverlay}
-          />
-        )}
-        
-        {settings.blur > 0 && Platform.OS === 'web' && (
-          <View style={[styles.blurOverlay, { 
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: `blur(${settings.blur / 10}px)`
-          }]} />
-        )}
-        
-        {/* Opacity overlay - higher opacity = more visible background */}
-        <View style={[styles.overlay, { 
-          backgroundColor: `rgba(255, 255, 255, ${1 - settings.opacity})` 
-        }]} />
+        {/* Temporarily disable all overlays to test background visibility */}
 
         <View style={styles.content}>
           {children}
