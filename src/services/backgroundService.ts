@@ -193,6 +193,35 @@ export class BackgroundService {
     return BACKGROUND_CATEGORIES;
   }
 
+  // Re-analyze current background colors (for existing backgrounds without color data)
+  static async reanalyzeCurrentBackground(): Promise<BackgroundImage | null> {
+    try {
+      const currentBackground = await this.getCurrentBackground();
+      if (!currentBackground) return null;
+
+      // If already has color data, return as is
+      if (currentBackground.textColor && currentBackground.secondaryTextColor) {
+        return currentBackground;
+      }
+
+      // Re-analyze colors
+      const colorAnalysis = await analyzeImageColors(currentBackground.url);
+      
+      const updatedBackground: BackgroundImage = {
+        ...currentBackground,
+        isDark: colorAnalysis.isDark,
+        textColor: colorAnalysis.textColor,
+        secondaryTextColor: colorAnalysis.secondaryTextColor,
+      };
+
+      await this.saveCurrentBackground(updatedBackground);
+      return updatedBackground;
+    } catch (error) {
+      console.error('Failed to re-analyze background colors:', error);
+      return null;
+    }
+  }
+
   // Refresh background if needed
   static async refreshBackgroundIfNeeded(): Promise<BackgroundImage | null> {
     try {

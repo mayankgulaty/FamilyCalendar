@@ -41,7 +41,11 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
       setSettings(backgroundSettings);
       
       if (backgroundSettings.enabled) {
-        const currentBackground = await BackgroundService.getCurrentBackground();
+        // First try to re-analyze existing background for color data
+        let currentBackground = await BackgroundService.reanalyzeCurrentBackground();
+        if (!currentBackground) {
+          currentBackground = await BackgroundService.getCurrentBackground();
+        }
         console.log('Current background:', currentBackground);
         setBackgroundImage(currentBackground);
         updateTextColors(currentBackground);
