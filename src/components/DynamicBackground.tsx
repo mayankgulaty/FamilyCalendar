@@ -107,7 +107,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
 
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: '#ff0000' }]}>
       <ImageBackground
         source={{ uri: backgroundImage.url }}
         style={styles.backgroundImage}
