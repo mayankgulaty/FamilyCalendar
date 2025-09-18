@@ -8,6 +8,7 @@ import {
   ScrollView,
   Switch,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
@@ -15,21 +16,115 @@ import { Widget } from '../types';
 import WeatherWidget from '../widgets/WeatherWidget';
 import QuickAddWidget from '../widgets/QuickAddWidget';
 import UpcomingEventsWidget from '../widgets/UpcomingEventsWidget';
+import NotesWidget from '../widgets/NotesWidget';
+import QuickTasksWidget from '../widgets/QuickTasksWidget';
+import CalendarStatsWidget from '../widgets/CalendarStatsWidget';
 
 interface WidgetManagerProps {
   onEventPress?: (event: any) => void;
   onEventAdded?: (event: any) => void;
 }
 
+const { width: screenWidth } = Dimensions.get('window');
+
 export default function WidgetManager({ onEventPress, onEventAdded }: WidgetManagerProps) {
   const { state, dispatch } = useApp();
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Calculate optimal widget layout with intelligent space management
+  const getWidgetLayout = () => {
+    const padding = 16;
+    const gap = 16;
+    const availableWidth = screenWidth - (padding * 2);
+    
+    // Define widget sizes and properties
+    const widgetSizes: { [key: string]: { width: number; height: number; priority: number; flexible: boolean } } = {
+      'weather': { width: 1, height: 1, priority: 1, flexible: true },
+      'quick-add': { width: 1, height: 1, priority: 2, flexible: true },
+      'upcoming-events': { width: 2, height: 1, priority: 3, flexible: true },
+      'notes': { width: 1, height: 1, priority: 4, flexible: true },
+      'quick-tasks': { width: 1, height: 1, priority: 5, flexible: true },
+      'calendar-stats': { width: 1, height: 1, priority: 6, flexible: true },
+    };
+
+    const enabledWidgets = state.widgets
+      .filter(widget => widget.enabled)
+      .sort((a, b) => a.position - b.position);
+
+    if (enabledWidgets.length === 0) return [];
+
+    // Smart layout algorithm that maximizes space usage
+    const rows: Widget[][] = [];
+    
+    // Calculate optimal distribution
+    const totalWidgets = enabledWidgets.length;
+    const maxWidgetsPerRow = Math.floor(availableWidth / (280 + gap)); // Base widget width + gap
+    
+    // If we have few widgets, try to fit them optimally
+    if (totalWidgets <= 4) {
+      // Special handling for common cases
+      if (totalWidgets === 1) {
+        rows.push([enabledWidgets[0]]);
+      } else if (totalWidgets === 2) {
+        rows.push(enabledWidgets); // Both in one row
+      } else if (totalWidgets === 3) {
+        // For 3 widgets, try to fit all in one row if screen is wide enough
+        if (maxWidgetsPerRow >= 3) {
+          rows.push(enabledWidgets);
+        } else {
+          rows.push([enabledWidgets[0], enabledWidgets[1]]);
+          rows.push([enabledWidgets[2]]);
+        }
+      } else if (totalWidgets === 4) {
+        // For 4 widgets, try 2x2 or 4x1 depending on screen width
+        if (maxWidgetsPerRow >= 4) {
+          rows.push(enabledWidgets); // All in one row
+        } else if (maxWidgetsPerRow >= 2) {
+          rows.push([enabledWidgets[0], enabledWidgets[1]]);
+          rows.push([enabledWidgets[2], enabledWidgets[3]]);
+        } else {
+          // Fallback to single column
+          enabledWidgets.forEach(widget => rows.push([widget]));
+        }
+      }
+    } else {
+      // For more widgets, use standard row-based layout
+      let currentRow: Widget[] = [];
+      let currentRowWidth = 0;
+      
+      enabledWidgets.forEach(widget => {
+        const size = widgetSizes[widget.type] || { width: 1, height: 1, priority: 1, flexible: true };
+        const widgetWidth = size.width;
+        
+        // Check if widget fits in current row
+        const wouldExceedRow = currentRowWidth + widgetWidth > maxWidgetsPerRow;
+        
+        if (wouldExceedRow && currentRow.length > 0) {
+          rows.push([...currentRow]);
+          currentRow = [widget];
+          currentRowWidth = widgetWidth;
+        } else {
+          currentRow.push(widget);
+          currentRowWidth += widgetWidth;
+        }
+      });
+      
+      if (currentRow.length > 0) {
+        rows.push(currentRow);
+      }
+    }
+
+    return rows;
+  };
+
   const availableWidgets: Omit<Widget, 'enabled' | 'position'>[] = [
     { id: 'weather', type: 'weather', title: 'Weather' },
     { id: 'quick-add', type: 'quick-add', title: 'Quick Add Event' },
     { id: 'upcoming-events', type: 'upcoming-events', title: 'Upcoming Events' },
+    { id: 'notes', type: 'notes', title: 'Family Notes' },
+    { id: 'quick-tasks', type: 'quick-tasks', title: 'Quick Tasks' },
+    { id: 'calendar-stats', type: 'calendar-stats', title: 'Calendar Stats' },
   ];
 
   const toggleWidget = (widgetId: string) => {
@@ -63,6 +158,12 @@ export default function WidgetManager({ onEventPress, onEventAdded }: WidgetMana
         return <QuickAddWidget key={widget.id} onEventAdded={onEventAdded} />;
       case 'upcoming-events':
         return <UpcomingEventsWidget key={widget.id} onEventPress={onEventPress} />;
+      case 'notes':
+        return <NotesWidget key={widget.id} />;
+      case 'quick-tasks':
+        return <QuickTasksWidget key={widget.id} />;
+      case 'calendar-stats':
+        return <CalendarStatsWidget key={widget.id} />;
       default:
         return null;
     }
@@ -76,9 +177,55 @@ export default function WidgetManager({ onEventPress, onEventAdded }: WidgetMana
     }, 1000);
   };
 
-  const enabledWidgets = state.widgets
-    .filter(widget => widget.enabled)
-    .sort((a, b) => a.position - b.position);
+  const widgetRows = getWidgetLayout();
+
+  const renderWidgetRow = (rowWidgets: Widget[], rowIndex: number) => {
+    // Calculate total units for this row
+    const totalRowWidth = rowWidgets.reduce((sum, widget) => {
+      const widgetSizes: { [key: string]: { width: number } } = {
+        'weather': { width: 1 },
+        'quick-add': { width: 1 },
+        'upcoming-events': { width: 2 },
+        'notes': { width: 1 },
+        'quick-tasks': { width: 1 },
+        'calendar-stats': { width: 1 },
+      };
+      return sum + (widgetSizes[widget.type]?.width || 1);
+    }, 0);
+
+    return (
+      <View key={rowIndex} style={styles.widgetRow}>
+        {rowWidgets.map((widget, index) => {
+          const widgetSizes: { [key: string]: { width: number } } = {
+            'weather': { width: 1 },
+            'quick-add': { width: 1 },
+            'upcoming-events': { width: 2 },
+            'notes': { width: 1 },
+            'quick-tasks': { width: 1 },
+            'calendar-stats': { width: 1 },
+          };
+          
+          const widgetWidth = widgetSizes[widget.type]?.width || 1;
+          
+          return (
+            <View 
+              key={widget.id} 
+              style={[
+                styles.widgetContainer,
+                { 
+                  flex: widgetWidth, // Use flex instead of flexBasis for better space filling
+                  minWidth: widget.type === 'upcoming-events' ? 400 : 280,
+                  maxWidth: widget.type === 'upcoming-events' ? undefined : 400,
+                }
+              ]}
+            >
+              {renderWidget(widget)}
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -92,25 +239,21 @@ export default function WidgetManager({ onEventPress, onEventAdded }: WidgetMana
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.widgetsContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.widgetsContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={['#6366f1']}
-            tintColor="#6366f1"
-          />
-        }
-      >
-        {enabledWidgets.map(widget => (
-          <View key={widget.id} style={styles.widgetWrapper}>
-            {renderWidget(widget)}
-          </View>
-        ))}
-      </ScrollView>
+        <ScrollView
+          style={styles.widgetsContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.widgetsContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#6366f1']}
+              tintColor="#6366f1"
+            />
+          }
+        >
+          {widgetRows.map((row, index) => renderWidgetRow(row, index))}
+        </ScrollView>
 
       <Modal
         animationType="slide"
@@ -163,6 +306,12 @@ function getWidgetDescription(type: string): string {
       return 'Quickly add new events to your calendar';
     case 'upcoming-events':
       return 'View your upcoming events for the next week';
+    case 'notes':
+      return 'Family notes and reminders';
+    case 'quick-tasks':
+      return 'Quick tasks and to-dos for the family';
+    case 'calendar-stats':
+      return 'Calendar usage statistics and insights';
     default:
       return '';
   }
@@ -200,6 +349,16 @@ const styles = StyleSheet.create({
   widgetsContent: {
     padding: 16,
     gap: 16,
+  },
+  widgetRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    gap: 16,
+    flexWrap: 'nowrap', // Don't wrap - let flex handle the sizing
+    alignItems: 'stretch', // Make all widgets same height
+  },
+  widgetContainer: {
+    // Remove fixed constraints - let flex handle everything
   },
   widgetWrapper: {
     marginBottom: 0,

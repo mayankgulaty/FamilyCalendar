@@ -12,7 +12,7 @@ export interface CalendarEvent {
 
 export interface Widget {
   id: string;
-  type: 'weather' | 'notes' | 'quick-add' | 'upcoming-events';
+  type: 'weather' | 'notes' | 'quick-add' | 'upcoming-events' | 'quick-tasks' | 'calendar-stats';
   title: string;
   enabled: boolean;
   position: number;
