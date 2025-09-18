@@ -1,0 +1,237 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useApp } from '../contexts/AppContext';
+import CalendarView from '../components/CalendarView';
+import WeeklyView from '../components/WeeklyView';
+import WidgetManager from '../components/WidgetManager';
+import ICalImportModal from '../components/ICalImport';
+import { CalendarEvent } from '../types';
+
+const { width } = Dimensions.get('window');
+
+export default function HomeScreen() {
+  const { state, dispatch } = useApp();
+  const [currentView, setCurrentView] = useState<'calendar' | 'weekly' | 'dashboard'>('calendar');
+  const [icalModalVisible, setIcalModalVisible] = useState(false);
+
+  const handleEventPress = (event: CalendarEvent) => {
+    Alert.alert(
+      event.title,
+      `${event.allDay ? 'All Day' : event.startDate.toLocaleString()}\n${event.description || ''}\n${event.location || ''}`,
+      [
+        { text: 'Close', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Delete Event',
+              'Are you sure you want to delete this event?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () => {
+                    dispatch({ type: 'DELETE_EVENT', payload: event.id });
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
+  const handleEventAdded = (event: CalendarEvent) => {
+    // Event is already added to state by the widget
+    console.log('Event added:', event);
+  };
+
+  const handleDatePress = (date: Date) => {
+    dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text style={styles.headerTitle}>Family Calendar</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setIcalModalVisible(true)}
+          >
+            <Ionicons name="cloud-download" size={20} color="#6b7280" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setCurrentView(currentView === 'calendar' ? 'dashboard' : 'calendar')}
+          >
+            <Ionicons 
+              name={currentView === 'calendar' ? 'grid' : 'calendar'} 
+              size={20} 
+              color="#6b7280" 
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        {currentView === 'calendar' ? (
+          <CalendarView
+            onEventPress={handleEventPress}
+            onDatePress={handleDatePress}
+          />
+        ) : currentView === 'weekly' ? (
+          <WeeklyView
+            onEventPress={handleEventPress}
+          />
+        ) : (
+          <WidgetManager
+            onEventPress={handleEventPress}
+            onEventAdded={handleEventAdded}
+          />
+        )}
+      </View>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={[styles.navItem, currentView === 'calendar' && styles.navItemActive]}
+          onPress={() => setCurrentView('calendar')}
+        >
+          <Ionicons 
+            name="calendar" 
+            size={24} 
+            color={currentView === 'calendar' ? '#6366f1' : '#9ca3af'} 
+          />
+          <Text style={[
+            styles.navLabel, 
+            currentView === 'calendar' && styles.navLabelActive
+          ]}>
+            Calendar
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.navItem, currentView === 'weekly' && styles.navItemActive]}
+          onPress={() => setCurrentView('weekly')}
+        >
+          <Ionicons 
+            name="calendar-outline" 
+            size={24} 
+            color={currentView === 'weekly' ? '#6366f1' : '#9ca3af'} 
+          />
+          <Text style={[
+            styles.navLabel, 
+            currentView === 'weekly' && styles.navLabelActive
+          ]}>
+            Week
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
+          onPress={() => setCurrentView('dashboard')}
+        >
+          <Ionicons 
+            name="grid" 
+            size={24} 
+            color={currentView === 'dashboard' ? '#6366f1' : '#9ca3af'} 
+          />
+          <Text style={[
+            styles.navLabel, 
+            currentView === 'dashboard' && styles.navLabelActive
+          ]}>
+            Dashboard
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* iCal Import Modal */}
+      <ICalImportModal
+        visible={icalModalVisible}
+        onClose={() => {
+          console.log('Closing modal');
+          setIcalModalVisible(false);
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    paddingTop: 50,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1f2937',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  headerButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#f3f4f6',
+  },
+  content: {
+    flex: 1,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    paddingBottom: 20,
+    paddingTop: 8,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  navItemActive: {
+    // Active state styling handled by text/icon colors
+  },
+  navLabel: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  navLabelActive: {
+    color: '#6366f1',
+  },
+});
