@@ -15,9 +15,8 @@ interface TextColorContextType {
 const TextColorContext = createContext<TextColorContextType | undefined>(undefined);
 
 const defaultTextColors: TextColors = {
-  primary: '#1f2937', // Dark gray
-  secondary: '#6b7280', // Medium gray
-  isDark: false,
+  primary: '#000000', // Pure black for light backgrounds - better contrast
+  secondary: '#333333', // Dark gray for secondary text on light backgrounds - better contrast
 };
 
 export function TextColorProvider({ children }: { children: React.ReactNode }) {
