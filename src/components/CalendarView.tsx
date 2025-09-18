@@ -164,8 +164,8 @@ export default function CalendarView({ onEventPress, onDatePress }: CalendarView
             onMonthChange={onMonthChange}
             markedDates={getMarkedDates()}
             theme={{
-              backgroundColor: '#ffffff',
-              calendarBackground: '#ffffff',
+              backgroundColor: 'transparent',
+              calendarBackground: 'transparent',
               textSectionTitleColor: '#6b7280',
               selectedDayBackgroundColor: '#6366f1',
               selectedDayTextColor: '#ffffff',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   calendarContainer: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     margin: 16,
     borderRadius: 16,
     elevation: 4,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
   eventsContainer: {
     margin: 16,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     borderRadius: 16,
     padding: 16,
     elevation: 2,

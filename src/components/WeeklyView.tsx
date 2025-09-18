@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
   dayColumn: {
     flex: 1,
     marginHorizontal: 2,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     borderRadius: 12,
     elevation: 2,
     shadowColor: '#000',
