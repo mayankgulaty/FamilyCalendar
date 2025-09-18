@@ -6,9 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
-  RefreshControl,
 } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
 import { useTextColors } from '../contexts/TextColorContext';
@@ -25,11 +23,10 @@ const { width, height } = Dimensions.get('window');
 export default function WallCalendarView({ onEventPress, onDatePress }: WallCalendarViewProps) {
   const { state, dispatch } = useApp();
   const { textColors } = useTextColors();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventModalVisible, setEventModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   // Update time every minute
   useEffect(() => {
@@ -39,53 +36,25 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
     return () => clearInterval(timer);
   }, []);
 
-  const getMarkedDates = () => {
-    const marked: any = {};
+  // Get current month dates
+  const getCurrentMonthDates = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
     
-    state.events.forEach(event => {
-      const dateKey = event.startDate.toISOString().split('T')[0];
-      if (marked[dateKey]) {
-        marked[dateKey].dots.push({
-          color: event.color || '#6366f1',
-          selectedDotColor: '#ffffff'
-        });
-        marked[dateKey].marked = true;
-      } else {
-        marked[dateKey] = {
-          dots: [{
-            color: event.color || '#6366f1',
-            selectedDotColor: '#ffffff'
-          }],
-          marked: true
-        };
-      }
-    });
-
-    // Highlight today
-    const today = new Date().toISOString().split('T')[0];
-    if (marked[today]) {
-      marked[today].selected = true;
-      marked[today].selectedColor = '#6366f1';
-    } else {
-      marked[today] = {
-        selected: true,
-        selectedColor: '#6366f1',
-        selectedTextColor: '#ffffff'
-      };
+    const dates = [];
+    const current = new Date(startDate);
+    
+    // Generate 6 weeks (42 days)
+    for (let i = 0; i < 42; i++) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
     }
-
-    return marked;
-  };
-
-  const onDayPress = (day: DateData) => {
-    const selectedDate = new Date(day.year, day.month - 1, day.day);
-    dispatch({ type: 'SET_SELECTED_DATE', payload: selectedDate });
-    onDatePress(selectedDate);
-  };
-
-  const onMonthChange = (month: DateData) => {
-    const newMonth = new Date(month.year, month.month - 1, 1);
-    setCurrentMonth(newMonth);
+    
+    return dates;
   };
 
   const getEventsForDate = (date: Date) => {
@@ -117,16 +86,6 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
     setSelectedEvent(null);
   };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Simulate refresh
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
-
-  const todayEvents = getEventsForDate(state.selectedDate);
-
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -142,6 +101,10 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
       day: 'numeric'
     });
   };
+
+  const monthDates = getCurrentMonthDates();
+  const today = new Date();
+  const todayEvents = getEventsForDate(today);
 
   return (
     <View style={styles.container}>
@@ -185,69 +148,95 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
 
       {/* Calendar Section */}
       <View style={styles.calendarSection}>
-        <Calendar
-          current={currentMonth.toISOString().split('T')[0]}
-          onDayPress={onDayPress}
-          onMonthChange={onMonthChange}
-          markedDates={getMarkedDates()}
-          theme={{
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            calendarBackground: 'rgba(0, 0, 0, 0.8)',
-            textSectionTitleColor: '#ffffff',
-            selectedDayBackgroundColor: '#6366f1',
-            selectedDayTextColor: '#ffffff',
-            todayTextColor: '#6366f1',
-            dayTextColor: '#ffffff',
-            textDisabledColor: '#666666',
-            dotColor: '#6366f1',
-            selectedDotColor: '#ffffff',
-            arrowColor: '#ffffff',
-            disabledArrowColor: '#666666',
-            monthTextColor: '#ffffff',
-            indicatorColor: '#6366f1',
-            textDayFontWeight: '600',
-            textMonthFontWeight: 'bold',
-            textDayHeaderFontWeight: '600',
-            textDayFontSize: 16,
-            textMonthFontSize: 18,
-            textDayHeaderFontSize: 14,
-          }}
-          style={styles.calendar}
-        />
+        {/* Month Header */}
+        <View style={styles.monthHeader}>
+          <Text style={styles.monthText}>
+            {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </Text>
+        </View>
 
-        {/* Today's Events */}
-        {todayEvents.length > 0 && (
-          <View style={styles.todayEventsContainer}>
-            <Text style={styles.todayEventsTitle}>Today's Events</Text>
-            <ScrollView style={styles.eventsList} showsVerticalScrollIndicator={false}>
-              {todayEvents.map((event) => (
-                <TouchableOpacity
-                  key={event.id}
-                  style={styles.eventItem}
-                  onPress={() => handleEventPress(event)}
-                >
-                  <View style={[styles.eventDot, { backgroundColor: event.color || '#6366f1' }]} />
-                  <View style={styles.eventDetails}>
-                    <Text style={styles.eventTitle}>{event.title}</Text>
-                    <Text style={styles.eventTime}>
-                      {event.allDay 
-                        ? 'All Day' 
-                        : event.startDate.toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                          })
-                      }
-                    </Text>
-                    {event.location && (
-                      <Text style={styles.eventLocation}>{event.location}</Text>
+        {/* Days of Week Header */}
+        <View style={styles.daysOfWeek}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <Text key={day} style={styles.dayHeader}>{day}</Text>
+          ))}
+        </View>
+
+        {/* Calendar Grid */}
+        <View style={styles.calendarGrid}>
+          {monthDates.map((date, index) => {
+            const isCurrentMonth = date.getMonth() === currentDate.getMonth();
+            const isToday = date.toDateString() === today.toDateString();
+            const dateEvents = getEventsForDate(date);
+            
+            return (
+              <View key={index} style={styles.dateCell}>
+                {/* Date Number */}
+                <View style={[styles.dateNumber, isToday && styles.todayDateNumber]}>
+                  <Text style={[
+                    styles.dateText,
+                    !isCurrentMonth && styles.otherMonthDate,
+                    isToday && styles.todayDateText
+                  ]}>
+                    {date.getDate()}
+                  </Text>
+                  {dateEvents.length > 0 && (
+                    <View style={styles.eventDots}>
+                      {dateEvents.slice(0, 3).map((_, eventIndex) => (
+                        <View 
+                          key={eventIndex} 
+                          style={[
+                            styles.eventDot, 
+                            { backgroundColor: dateEvents[eventIndex].color || '#6366f1' }
+                          ]} 
+                        />
+                      ))}
+                    </View>
+                  )}
+                </View>
+
+                {/* Events for this date */}
+                {dateEvents.length > 0 && (
+                  <View style={styles.eventsContainer}>
+                    {dateEvents.slice(0, 2).map((event) => (
+                      <TouchableOpacity
+                        key={event.id}
+                        style={styles.eventSquare}
+                        onPress={() => handleEventPress(event)}
+                      >
+                        <Text style={styles.eventTime}>
+                          {event.allDay 
+                            ? 'All Day' 
+                            : event.startDate.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })
+                          }
+                        </Text>
+                        <Text style={styles.eventTitle} numberOfLines={2}>
+                          {event.title}
+                        </Text>
+                        {event.location && (
+                          <Text style={styles.eventLocation} numberOfLines={1}>
+                            {event.location}
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                    {dateEvents.length > 2 && (
+                      <View style={styles.moreEvents}>
+                        <Text style={styles.moreEventsText}>
+                          +{dateEvents.length - 2} more
+                        </Text>
+                      </View>
                     )}
                   </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
+                )}
+              </View>
+            );
+          })}
+        </View>
       </View>
 
       {/* Event Details Modal */}
@@ -268,12 +257,12 @@ const styles = StyleSheet.create({
   },
   timeDateOverlay: {
     position: 'absolute',
-    top: 100,
+    top: 60,
     left: 20,
     zIndex: 10,
   },
   timeText: {
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
@@ -281,16 +270,17 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   dateText: {
-    fontSize: 18,
+    fontSize: 16,
     color: 'white',
     fontWeight: '500',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+    marginTop: 4,
   },
   weatherOverlay: {
     position: 'absolute',
-    top: 100,
+    top: 60,
     right: 20,
     zIndex: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -303,7 +293,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   temperature: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -335,61 +325,113 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: height * 0.65,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    height: height * 0.7,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,
-  },
-  calendar: {
-    borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 8,
   },
-  todayEventsContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 10,
+  monthHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  todayEventsTitle: {
-    fontSize: 18,
+  monthText: {
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 12,
   },
-  eventsList: {
+  daysOfWeek: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  dayHeader: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.8)',
+    paddingVertical: 8,
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     flex: 1,
   },
-  eventItem: {
-    flexDirection: 'row',
+  dateCell: {
+    width: '14.28%', // 100% / 7 days
+    minHeight: 80,
+    padding: 2,
+  },
+  dateNumber: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  todayDateNumber: {
+    backgroundColor: '#6366f1',
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+    textAlign: 'center',
+  },
+  otherMonthDate: {
+    color: 'rgba(255, 255, 255, 0.4)',
+  },
+  todayDateText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  eventDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 2,
   },
   eventDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 12,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 1,
   },
-  eventDetails: {
+  eventsContainer: {
     flex: 1,
   },
+  eventSquare: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 6,
+    marginBottom: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: '#6366f1',
+  },
+  eventTime: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 2,
+  },
   eventTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: 'white',
     marginBottom: 2,
   },
-  eventTime: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-  },
   eventLocation: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.6)',
-    marginTop: 2,
+  },
+  moreEvents: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 6,
+    padding: 4,
+    alignItems: 'center',
+  },
+  moreEventsText: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.6)',
   },
 });
