@@ -141,26 +141,26 @@ export default function CalendarView({ onEventPress, onDatePress }: CalendarView
             onMonthChange={onMonthChange}
             markedDates={getMarkedDates()}
             theme={{
-              backgroundColor: 'transparent',
-              calendarBackground: 'transparent',
-              textSectionTitleColor: textColors.secondary,
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              calendarBackground: 'rgba(255, 255, 255, 0.1)',
+              textSectionTitleColor: '#000000',
               selectedDayBackgroundColor: '#6366f1',
               selectedDayTextColor: '#ffffff',
               todayTextColor: '#6366f1',
-              dayTextColor: textColors.primary,
-              textDisabledColor: textColors.secondary,
+              dayTextColor: '#000000',
+              textDisabledColor: '#666666',
               dotColor: '#6366f1',
               selectedDotColor: '#ffffff',
-              arrowColor: '#6366f1',
-              disabledArrowColor: textColors.secondary,
-              monthTextColor: textColors.primary,
+              arrowColor: '#000000',
+              disabledArrowColor: '#999999',
+              monthTextColor: '#000000',
               indicatorColor: '#6366f1',
-              textDayFontWeight: '500',
+              textDayFontWeight: '700',
               textMonthFontWeight: 'bold',
-              textDayHeaderFontWeight: '600',
-              textDayFontSize: 16,
-              textMonthFontSize: 18,
-              textDayHeaderFontSize: 14,
+              textDayHeaderFontWeight: '700',
+              textDayFontSize: 18,
+              textMonthFontSize: 20,
+              textDayHeaderFontSize: 16,
             }}
             style={styles.calendar}
           />
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   calendarContainer: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     margin: 16,
     borderRadius: 16,
     elevation: 4,
@@ -254,6 +254,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
+    // Add text shadow for better readability
+    shadowColor: '#ffffff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 0,
   },
   eventsContainer: {
     margin: 16,

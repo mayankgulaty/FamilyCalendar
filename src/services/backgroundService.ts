@@ -36,10 +36,9 @@ function analyzeImageColors(imageUrl: string): Promise<{ isDark: boolean; textCo
     
     // Improved brightness estimation based on image ID (for demo purposes)
     // This is a more sophisticated heuristic that better matches actual image brightness
-    // Lower IDs (0-200): tend to be lighter
-    // Mid IDs (200-600): mixed, but more likely light
-    // Higher IDs (600+): tend to be darker
-    const isDark = imageId > 600 || (imageId > 300 && imageId % 3 === 0);
+    // For complex backgrounds like mountains/nature, we'll be more conservative
+    // and assume they need dark text for better readability
+    const isDark = imageId > 400 || imageId % 5 === 0 || imageId % 7 === 0;
     
     console.log('Color analysis for image', imageId, ':', { isDark, textColor: isDark ? '#ffffff' : '#000000' });
     
