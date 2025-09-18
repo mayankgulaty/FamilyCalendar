@@ -238,6 +238,7 @@ export default function HomeScreen() {
         onSettingsChange={handleBackgroundSettingsChange}
         onBackgroundRefresh={handleBackgroundRefresh}
       />
+      </View>
     </DynamicBackground>
   );
 }
