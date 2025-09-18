@@ -120,24 +120,22 @@ export default function HomeScreen() {
           </View>
         </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {currentView === 'calendar' ? (
-          <CalendarView
-            onEventPress={handleEventPress}
-            onDatePress={handleDatePress}
-          />
-        ) : currentView === 'weekly' ? (
-          <WeeklyView
-            onEventPress={handleEventPress}
-          />
-        ) : (
-          <WidgetManager
-            onEventPress={handleEventPress}
-            onEventAdded={handleEventAdded}
-          />
-        )}
-      </View>
+      {/* Content - Remove wrapper to allow background to show */}
+      {currentView === 'calendar' ? (
+        <CalendarView
+          onEventPress={handleEventPress}
+          onDatePress={handleDatePress}
+        />
+      ) : currentView === 'weekly' ? (
+        <WeeklyView
+          onEventPress={handleEventPress}
+        />
+      ) : (
+        <WidgetManager
+          onEventPress={handleEventPress}
+          onEventAdded={handleEventAdded}
+        />
+      )}
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
