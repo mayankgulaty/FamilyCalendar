@@ -44,10 +44,13 @@ export default function BackgroundSettingsModal({
 
   const loadSettings = async () => {
     try {
+      console.log('Loading background settings in modal...');
       const backgroundSettings = await BackgroundService.getBackgroundSettings();
+      console.log('Modal loaded settings:', backgroundSettings);
       setSettings(backgroundSettings);
       
       const background = await BackgroundService.getCurrentBackground();
+      console.log('Modal loaded background:', background);
       setCurrentBackground(background);
     } catch (error) {
       console.error('Failed to load background settings:', error);
@@ -138,6 +141,12 @@ export default function BackgroundSettingsModal({
           </View>
 
           <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+            {/* Debug Info */}
+            <View style={styles.debugInfo}>
+              <Text style={styles.debugText}>Settings loaded: {JSON.stringify(settings)}</Text>
+              <Text style={styles.debugText}>Current background: {currentBackground ? 'Yes' : 'No'}</Text>
+            </View>
+            
             {/* Enable/Disable Background */}
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
@@ -314,6 +323,7 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 500,
     maxHeight: '80%',
+    minHeight: 400,
     elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
@@ -470,5 +480,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  debugInfo: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    margin: 10,
+    borderRadius: 5,
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
   },
 });
