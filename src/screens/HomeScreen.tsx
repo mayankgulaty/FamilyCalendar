@@ -123,8 +123,9 @@ export default function HomeScreen() {
           </View>
         </View>
 
-      {/* Content - Remove wrapper to allow background to show */}
-      {currentView === 'calendar' ? (
+      {/* Main Content */}
+      <View style={styles.container}>
+        {currentView === 'calendar' ? (
         <CalendarView
           onEventPress={handleEventPress}
           onDatePress={handleDatePress}
@@ -144,6 +145,7 @@ export default function HomeScreen() {
           onEventAdded={handleEventAdded}
         />
       )}
+      </View>
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
