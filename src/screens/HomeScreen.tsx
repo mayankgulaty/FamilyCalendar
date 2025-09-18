@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingTop: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'transparent',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(229, 231, 235, 0.5)',
     backdropFilter: 'blur(10px)',
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'transparent',
     borderTopWidth: 1,
     borderTopColor: 'rgba(229, 231, 235, 0.5)',
     paddingBottom: 20,

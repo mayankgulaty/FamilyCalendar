@@ -42,6 +42,7 @@ export default function BackgroundSettingsModal({
     }
   }, [visible]);
 
+
   const loadSettings = async () => {
     try {
       const backgroundSettings = await BackgroundService.getBackgroundSettings();
@@ -99,6 +100,8 @@ export default function BackgroundSettingsModal({
       setLoading(true);
       const newBackground = await BackgroundService.forceRefreshBackground();
       setCurrentBackground(newBackground);
+      // Reload all settings to get updated info
+      await loadSettings();
       onBackgroundRefresh?.();
     } catch (error) {
       console.error('Failed to refresh background:', error);
