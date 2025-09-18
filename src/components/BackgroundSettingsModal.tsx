@@ -49,6 +49,7 @@ export default function BackgroundSettingsModal({
       setSettings(backgroundSettings);
       
       const background = await BackgroundService.getCurrentBackground();
+      console.log('Modal loading background:', background);
       setCurrentBackground(background);
     } catch (error) {
       console.error('Failed to load background settings:', error);

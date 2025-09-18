@@ -143,7 +143,7 @@ export class BackgroundService {
       const backgroundImage: BackgroundImage = {
         id: `picsum-${imageId}`,
         url: fallbackUrls[0], // Use first URL as primary
-        author: 'Lorem Picsum',
+        author: `Lorem Picsum #${imageId}`,
         downloadUrl: fallbackUrls[0],
         timestamp: Date.now(),
         fallbackUrls: fallbackUrls.slice(1), // Store fallbacks
