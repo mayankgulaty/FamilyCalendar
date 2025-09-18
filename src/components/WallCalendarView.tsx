@@ -186,67 +186,73 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                 isLastRow && styles.lastRowCell,
                 isLastColumn && styles.lastColumnCell
               ]}>
-                {/* Date Number */}
-                <View style={[styles.dateNumber, isToday && styles.todayDateNumber]}>
-                  <Text style={[
-                    styles.dateText,
-                    isToday && styles.todayDateText
-                  ]}>
-                    {date.getDate()}
-                  </Text>
-                  {dateEvents.length > 0 && (
-                    <View style={styles.eventDots}>
-                      {dateEvents.slice(0, 3).map((_, eventIndex) => (
-                        <View 
-                          key={eventIndex} 
-                          style={[
-                            styles.eventDot, 
-                            { backgroundColor: dateEvents[eventIndex].color || '#6366f1' }
-                          ]} 
-                        />
-                      ))}
-                    </View>
-                  )}
-                </View>
-
-                {/* Events for this date */}
-                {dateEvents.length > 0 && (
-                  <View style={styles.eventsContainer}>
-                    {dateEvents.slice(0, 3).map((event) => (
-                      <TouchableOpacity
-                        key={event.id}
-                        style={[styles.eventSquare, { borderLeftColor: event.color || '#6366f1' }]}
-                        onPress={() => handleEventPress(event)}
-                      >
-                        <Text style={styles.eventTime}>
-                          {event.allDay 
-                            ? 'All Day' 
-                            : event.startDate.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
-                              })
-                          }
-                        </Text>
-                        <Text style={styles.eventTitle} numberOfLines={1}>
-                          {event.title}
-                        </Text>
-                        {event.location && (
-                          <Text style={styles.eventLocation} numberOfLines={1}>
-                            {event.location}
-                          </Text>
-                        )}
-                      </TouchableOpacity>
-                    ))}
-                    {dateEvents.length > 3 && (
-                      <View style={styles.moreEvents}>
-                        <Text style={styles.moreEventsText}>
-                          +{dateEvents.length - 3} more
-                        </Text>
+                {/* Date Header */}
+                <View style={styles.dateHeader}>
+                  <View style={[styles.dateNumber, isToday && styles.todayDateNumber]}>
+                    <Text style={[
+                      styles.dateText,
+                      isToday && styles.todayDateText
+                    ]}>
+                      {date.getDate()}
+                    </Text>
+                    {dateEvents.length > 0 && (
+                      <View style={styles.eventDots}>
+                        {dateEvents.slice(0, 3).map((_, eventIndex) => (
+                          <View 
+                            key={eventIndex} 
+                            style={[
+                              styles.eventDot, 
+                              { backgroundColor: dateEvents[eventIndex].color || '#6366f1' }
+                            ]} 
+                          />
+                        ))}
                       </View>
                     )}
                   </View>
-                )}
+                </View>
+
+                {/* Events for this date */}
+                <View style={styles.eventsContainer}>
+                  {dateEvents.slice(0, 4).map((event, eventIndex) => (
+                    <TouchableOpacity
+                      key={event.id}
+                      style={[
+                        styles.eventSquare, 
+                        { 
+                          borderLeftColor: event.color || '#6366f1',
+                          marginBottom: eventIndex < 3 ? 4 : 0
+                        }
+                      ]}
+                      onPress={() => handleEventPress(event)}
+                    >
+                      <Text style={styles.eventTime}>
+                        {event.allDay 
+                          ? 'All Day' 
+                          : event.startDate.toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            })
+                        }
+                      </Text>
+                      <Text style={styles.eventTitle} numberOfLines={1}>
+                        {event.title}
+                      </Text>
+                      {event.location && (
+                        <Text style={styles.eventLocation} numberOfLines={1}>
+                          {event.location}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                  {dateEvents.length > 4 && (
+                    <View style={styles.moreEvents}>
+                      <Text style={styles.moreEventsText}>
+                        +{dateEvents.length - 4} more
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
             );
           })}
@@ -339,7 +345,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: height * 0.75,
+    height: height * 0.8,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -381,16 +387,17 @@ const styles = StyleSheet.create({
   },
   dateCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 120,
+    minHeight: 140,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    padding: 6,
+    padding: 8,
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    justifyContent: 'flex-start',
   },
   emptyCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 120,
+    minHeight: 140,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
@@ -402,15 +409,21 @@ const styles = StyleSheet.create({
   lastColumnCell: {
     borderRightWidth: 0,
   },
+  dateHeader: {
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   dateNumber: {
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
     borderRadius: 6,
-    marginBottom: 6,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    minWidth: 32,
   },
   todayDateNumber: {
     backgroundColor: '#6366f1',
@@ -441,13 +454,13 @@ const styles = StyleSheet.create({
   },
   eventsContainer: {
     flex: 1,
-    paddingTop: 2,
+    paddingTop: 0,
+    justifyContent: 'flex-start',
   },
   eventSquare: {
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 4,
-    padding: 6,
-    marginBottom: 4,
+    padding: 5,
     borderLeftWidth: 3,
     borderLeftColor: '#6366f1',
     shadowColor: '#000',
@@ -455,24 +468,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 1,
     elevation: 1,
+    minHeight: 28,
+    justifyContent: 'center',
   },
   eventTime: {
-    fontSize: 10,
+    fontSize: 9,
     color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 2,
+    marginBottom: 1,
     fontWeight: '500',
   },
   eventTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: 'white',
-    marginBottom: 2,
-    lineHeight: 14,
+    marginBottom: 1,
+    lineHeight: 13,
   },
   eventLocation: {
-    fontSize: 9,
+    fontSize: 8,
     color: 'rgba(255, 255, 255, 0.6)',
-    lineHeight: 11,
+    lineHeight: 10,
   },
   moreEvents: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
