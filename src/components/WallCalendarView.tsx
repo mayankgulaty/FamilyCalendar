@@ -25,16 +25,8 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
   const { textColors } = useTextColors();
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventModalVisible, setEventModalVisible] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Update time every minute
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(timer);
-  }, []);
 
   // Get current month dates only
   const getCurrentMonthDates = () => {
@@ -91,21 +83,6 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
     setSelectedEvent(null);
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const monthDates = getCurrentMonthDates();
   const today = new Date();
@@ -113,46 +90,6 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
 
   return (
     <View style={styles.container}>
-      {/* Top Section - Time/Date and Weather */}
-      <View style={styles.topSection}>
-        {/* Time and Date Section */}
-        <View style={styles.timeDateSection}>
-          <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-          <Text style={styles.dateText}>{formatDate(currentTime)}</Text>
-        </View>
-
-        {/* Weather Section */}
-        <View style={styles.weatherSection}>
-          <View style={styles.currentWeather}>
-            <Text style={styles.temperature}>49°</Text>
-            <Ionicons name="cloudy" size={24} color="white" />
-            <Text style={styles.feelsLike}>Feels like 40°</Text>
-          </View>
-          
-          <View style={styles.forecast}>
-            <View style={styles.forecastDay}>
-              <Text style={styles.forecastLabel}>Today</Text>
-              <Ionicons name="rainy" size={16} color="white" />
-              <Text style={styles.forecastTemp}>49 40</Text>
-            </View>
-            <View style={styles.forecastDay}>
-              <Text style={styles.forecastLabel}>Wed</Text>
-              <Ionicons name="rainy" size={16} color="white" />
-              <Text style={styles.forecastTemp}>49 39</Text>
-            </View>
-            <View style={styles.forecastDay}>
-              <Text style={styles.forecastLabel}>Thu</Text>
-              <Ionicons name="sunny" size={16} color="white" />
-              <Text style={styles.forecastTemp}>56 36</Text>
-            </View>
-            <View style={styles.forecastDay}>
-              <Text style={styles.forecastLabel}>Fri</Text>
-              <Ionicons name="sunny" size={16} color="white" />
-              <Text style={styles.forecastTemp}>63 38</Text>
-            </View>
-          </View>
-        </View>
-      </View>
 
       {/* Calendar Section */}
       <View style={styles.calendarSection}>
@@ -286,95 +223,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  topSection: {
-    position: 'absolute',
-    top: 140,
-    left: 10,
-    right: 10,
-    height: 70,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  timeDateSection: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 12,
-    padding: 8,
-    marginRight: 3,
-    height: 50,
-    justifyContent: 'center',
-  },
-  weatherSection: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 12,
-    padding: 6,
-    marginLeft: 3,
-    height: 50,
-    justifyContent: 'center',
-  },
-  timeText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 6,
-    lineHeight: 24,
-  },
-  dateText: {
-    fontSize: 10,
-    color: 'white',
-    fontWeight: '500',
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
-    marginTop: 0,
-    lineHeight: 12,
-  },
-  currentWeather: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 0,
-  },
-  temperature: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: 'white',
-    marginRight: 2,
-  },
-  feelsLike: {
-    fontSize: 6,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 0,
-  },
-  forecast: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  forecastDay: {
-    alignItems: 'center',
-    marginHorizontal: 2,
-  },
-  forecastLabel: {
-    fontSize: 8,
-    color: 'white',
-    marginBottom: 2,
-  },
-  forecastTemp: {
-    fontSize: 8,
-    color: 'white',
-    marginTop: 2,
-  },
   calendarSection: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: height * 0.85,
+    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
