@@ -82,6 +82,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
 
   // If background is disabled or no image, render children with default background
   if (!settings?.enabled || !backgroundImage) {
+    console.log('Rendering default background - enabled:', settings?.enabled, 'image:', !!backgroundImage);
     return (
       <View style={styles.defaultContainer}>
         {children}
@@ -91,6 +92,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
 
   // If image failed to load, show fallback
   if (imageError) {
+    console.log('Rendering fallback background due to image error');
     return (
       <View style={styles.container}>
         <View style={[styles.backgroundImage, styles.fallbackBackground]}>
@@ -102,6 +104,8 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
     );
   }
 
+  console.log('Rendering ImageBackground with URL:', backgroundImage.url);
+  
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -119,6 +123,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
         }}
         onLoad={() => {
           console.log('Background image loaded successfully');
+          setImageError(false);
         }}
       >
         {settings.blur > 0 && Platform.OS !== 'web' && (
