@@ -84,10 +84,9 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#00ff00' }}>
-      <DynamicBackground 
-        refreshTrigger={backgroundRefreshTrigger}
-      >
+    <DynamicBackground 
+      refreshTrigger={backgroundRefreshTrigger}
+    >
         {/* Remove container wrapper to test */}
         {/* Header */}
         <View style={styles.header}>
@@ -207,8 +206,7 @@ export default function HomeScreen() {
         onSettingsChange={handleBackgroundSettingsChange}
         onBackgroundRefresh={handleBackgroundRefresh}
       />
-      </DynamicBackground>
-    </View>
+    </DynamicBackground>
   );
 }
 

@@ -320,7 +320,7 @@ function getWidgetDescription(type: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',

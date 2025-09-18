@@ -341,7 +341,7 @@ export default function WeeklyView({ onEventPress }: WeeklyViewProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   header: {
     paddingTop: 50,
