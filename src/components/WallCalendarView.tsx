@@ -36,7 +36,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
     return () => clearInterval(timer);
   }, []);
 
-  // Get current month dates
+  // Get current month dates only
   const getCurrentMonthDates = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -48,9 +48,14 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
     const dates = [];
     const current = new Date(startDate);
     
-    // Generate 6 weeks (42 days)
+    // Generate 6 weeks (42 days) but filter to show only current month
     for (let i = 0; i < 42; i++) {
-      dates.push(new Date(current));
+      const date = new Date(current);
+      if (date.getMonth() === month) {
+        dates.push(date);
+      } else {
+        dates.push(null); // Placeholder for empty cells
+      }
       current.setDate(current.getDate() + 1);
     }
     
@@ -165,7 +170,11 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
         {/* Calendar Grid */}
         <View style={styles.calendarGrid}>
           {monthDates.map((date, index) => {
-            const isCurrentMonth = date.getMonth() === currentDate.getMonth();
+            // Skip empty cells (null dates)
+            if (!date) {
+              return <View key={index} style={styles.emptyCell} />;
+            }
+            
             const isToday = date.toDateString() === today.toDateString();
             const dateEvents = getEventsForDate(date);
             const isLastRow = index >= 35; // Last 7 cells (6th row)
@@ -181,7 +190,6 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                 <View style={[styles.dateNumber, isToday && styles.todayDateNumber]}>
                   <Text style={[
                     styles.dateText,
-                    !isCurrentMonth && styles.otherMonthDate,
                     isToday && styles.todayDateText
                   ]}>
                     {date.getDate()}
@@ -204,10 +212,10 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                 {/* Events for this date */}
                 {dateEvents.length > 0 && (
                   <View style={styles.eventsContainer}>
-                    {dateEvents.slice(0, 2).map((event) => (
+                    {dateEvents.slice(0, 3).map((event) => (
                       <TouchableOpacity
                         key={event.id}
-                        style={styles.eventSquare}
+                        style={[styles.eventSquare, { borderLeftColor: event.color || '#6366f1' }]}
                         onPress={() => handleEventPress(event)}
                       >
                         <Text style={styles.eventTime}>
@@ -220,7 +228,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                               })
                           }
                         </Text>
-                        <Text style={styles.eventTitle} numberOfLines={2}>
+                        <Text style={styles.eventTitle} numberOfLines={1}>
                           {event.title}
                         </Text>
                         {event.location && (
@@ -230,10 +238,10 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                         )}
                       </TouchableOpacity>
                     ))}
-                    {dateEvents.length > 2 && (
+                    {dateEvents.length > 3 && (
                       <View style={styles.moreEvents}>
                         <Text style={styles.moreEventsText}>
-                          +{dateEvents.length - 2} more
+                          +{dateEvents.length - 3} more
                         </Text>
                       </View>
                     )}
@@ -373,12 +381,20 @@ const styles = StyleSheet.create({
   },
   dateCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 100,
+    minHeight: 120,
     borderRightWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    padding: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+  },
+  emptyCell: {
+    width: '14.28%', // 100% / 7 days
+    minHeight: 120,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   lastRowCell: {
     borderBottomWidth: 0,
@@ -428,35 +444,35 @@ const styles = StyleSheet.create({
     paddingTop: 2,
   },
   eventSquare: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 4,
+    padding: 6,
+    marginBottom: 4,
     borderLeftWidth: 3,
     borderLeftColor: '#6366f1',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.15,
+    shadowRadius: 1,
+    elevation: 1,
   },
   eventTime: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 3,
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 2,
     fontWeight: '500',
   },
   eventTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: 'white',
-    marginBottom: 3,
-    lineHeight: 16,
+    marginBottom: 2,
+    lineHeight: 14,
   },
   eventLocation: {
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.7)',
-    lineHeight: 12,
+    fontSize: 9,
+    color: 'rgba(255, 255, 255, 0.6)',
+    lineHeight: 11,
   },
   moreEvents: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
