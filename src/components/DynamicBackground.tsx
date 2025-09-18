@@ -110,11 +110,6 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
   
   return (
     <View style={styles.container}>
-      {/* Debug indicator */}
-      <View style={styles.debugIndicator}>
-        <Text style={styles.debugText}>BG: {backgroundImage.url.substring(0, 30)}...</Text>
-      </View>
-      
       <ImageBackground
         source={{ uri: backgroundImage.url }}
         style={styles.backgroundImage}
@@ -136,20 +131,21 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
         {settings.blur > 0 && Platform.OS !== 'web' && (
           <BlurView
             intensity={settings.blur}
-            style={[styles.blurOverlay, { opacity: settings.opacity }]}
+            style={styles.blurOverlay}
           />
         )}
         
         {settings.blur > 0 && Platform.OS === 'web' && (
           <View style={[styles.blurOverlay, { 
-            backgroundColor: `rgba(0, 0, 0, ${settings.opacity * 0.5})`,
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
             backdropFilter: `blur(${settings.blur / 10}px)`
           }]} />
         )}
         
-        {!settings.blur && (
-          <View style={[styles.overlay, { opacity: 1 - settings.opacity }]} />
-        )}
+        {/* Opacity overlay - higher opacity = more visible background */}
+        <View style={[styles.overlay, { 
+          backgroundColor: `rgba(255, 255, 255, ${1 - settings.opacity})` 
+        }]} />
 
         <View style={styles.content}>
           {children}
@@ -180,7 +176,7 @@ const styles = StyleSheet.create({
   },
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
