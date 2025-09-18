@@ -15,6 +15,9 @@ export interface BackgroundImage {
   downloadUrl: string;
   timestamp: number;
   fallbackUrls?: string[];
+  isDark?: boolean;
+  textColor?: string;
+  secondaryTextColor?: string;
 }
 
 const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // You'll need to get this from Unsplash
@@ -23,6 +26,24 @@ const STORAGE_KEYS = {
   CURRENT_BACKGROUND: 'current_background',
   LAST_REFRESH: 'last_background_refresh',
 };
+
+// Utility function to analyze image brightness and determine text colors
+function analyzeImageColors(imageUrl: string): Promise<{ isDark: boolean; textColor: string; secondaryTextColor: string }> {
+  return new Promise((resolve) => {
+    // For now, we'll use a simple heuristic based on the image ID
+    // In a real app, you'd analyze the actual image pixels
+    const imageId = parseInt(imageUrl.match(/random=(\d+)/)?.[1] || '0');
+    
+    // Simple brightness estimation based on image ID (for demo purposes)
+    // Even IDs tend to be brighter, odd IDs tend to be darker
+    const isDark = imageId % 2 === 1 || imageId > 500;
+    
+    const textColor = isDark ? '#ffffff' : '#1f2937';
+    const secondaryTextColor = isDark ? '#e5e7eb' : '#6b7280';
+    
+    resolve({ isDark, textColor, secondaryTextColor });
+  });
+}
 
 // Categories for different moods
 const BACKGROUND_CATEGORIES = [
@@ -140,6 +161,9 @@ export class BackgroundService {
         `https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=${width}&h=${height}&fit=crop`,
       ];
       
+      // Analyze image colors for text contrast
+      const colorAnalysis = await analyzeImageColors(fallbackUrls[0]);
+      
       const backgroundImage: BackgroundImage = {
         id: `picsum-${imageId}`,
         url: fallbackUrls[0], // Use first URL as primary
@@ -147,9 +171,13 @@ export class BackgroundService {
         downloadUrl: fallbackUrls[0],
         timestamp: Date.now(),
         fallbackUrls: fallbackUrls.slice(1), // Store fallbacks
+        isDark: colorAnalysis.isDark,
+        textColor: colorAnalysis.textColor,
+        secondaryTextColor: colorAnalysis.secondaryTextColor,
       };
 
       console.log('Fetching background image:', backgroundImage.url);
+      console.log('Image color analysis:', { isDark: backgroundImage.isDark, textColor: backgroundImage.textColor });
       await this.saveCurrentBackground(backgroundImage);
       return backgroundImage;
     } catch (error) {

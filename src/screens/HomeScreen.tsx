@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
+import { useTextColors } from '../contexts/TextColorContext';
 import CalendarView from '../components/CalendarView';
 import WeeklyView from '../components/WeeklyView';
 import WidgetManager from '../components/WidgetManager';
@@ -22,6 +23,7 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const { state, dispatch } = useApp();
+  const { textColors } = useTextColors();
   const [currentView, setCurrentView] = useState<'calendar' | 'weekly' | 'dashboard'>('calendar');
   const [icalModalVisible, setIcalModalVisible] = useState(false);
   const [backgroundModalVisible, setBackgroundModalVisible] = useState(false);
@@ -92,30 +94,30 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>Family Calendar</Text>
+            <Text style={[styles.headerTitle, { color: textColors.primary }]}>Family Calendar</Text>
           </View>
           <View style={styles.headerRight}>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={() => setBackgroundModalVisible(true)}
             >
-              <Ionicons name="image" size={20} color="#6b7280" />
+              <Ionicons name="image" size={20} color={textColors.secondary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={() => setIcalModalVisible(true)}
             >
-              <Ionicons name="cloud-download" size={20} color="#6b7280" />
+              <Ionicons name="cloud-download" size={20} color={textColors.secondary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={() => setCurrentView(currentView === 'calendar' ? 'dashboard' : 'calendar')}
             >
-              <Ionicons 
-                name={currentView === 'calendar' ? 'grid' : 'calendar'} 
-                size={20} 
-                color="#6b7280" 
-              />
+                <Ionicons 
+                  name={currentView === 'calendar' ? 'grid' : 'calendar'} 
+                  size={20} 
+                  color={textColors.secondary} 
+                />
             </TouchableOpacity>
           </View>
         </View>
@@ -146,11 +148,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="calendar" 
             size={24} 
-            color={currentView === 'calendar' ? '#6366f1' : '#9ca3af'} 
+            color={currentView === 'calendar' ? '#6366f1' : textColors.secondary} 
           />
           <Text style={[
             styles.navLabel, 
-            currentView === 'calendar' && styles.navLabelActive
+            currentView === 'calendar' && styles.navLabelActive,
+            { color: currentView === 'calendar' ? '#6366f1' : textColors.secondary }
           ]}>
             Calendar
           </Text>
@@ -163,11 +166,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="calendar-outline" 
             size={24} 
-            color={currentView === 'weekly' ? '#6366f1' : '#9ca3af'} 
+            color={currentView === 'weekly' ? '#6366f1' : textColors.secondary} 
           />
           <Text style={[
             styles.navLabel, 
-            currentView === 'weekly' && styles.navLabelActive
+            currentView === 'weekly' && styles.navLabelActive,
+            { color: currentView === 'weekly' ? '#6366f1' : textColors.secondary }
           ]}>
             Week
           </Text>
@@ -180,11 +184,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="grid" 
             size={24} 
-            color={currentView === 'dashboard' ? '#6366f1' : '#9ca3af'} 
+            color={currentView === 'dashboard' ? '#6366f1' : textColors.secondary} 
           />
           <Text style={[
             styles.navLabel, 
-            currentView === 'dashboard' && styles.navLabelActive
+            currentView === 'dashboard' && styles.navLabelActive,
+            { color: currentView === 'dashboard' ? '#6366f1' : textColors.secondary }
           ]}>
             Dashboard
           </Text>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Platform, Text } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BackgroundService, BackgroundImage, BackgroundSettings } from '../services/backgroundService';
+import { useTextColors } from '../contexts/TextColorContext';
 
 interface DynamicBackgroundProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
   const [settings, setSettings] = useState<BackgroundSettings | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const { updateTextColors } = useTextColors();
   
 
   useEffect(() => {
@@ -42,9 +44,11 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
         const currentBackground = await BackgroundService.getCurrentBackground();
         console.log('Current background:', currentBackground);
         setBackgroundImage(currentBackground);
+        updateTextColors(currentBackground);
       } else {
         console.log('Background is disabled');
         setBackgroundImage(null);
+        updateTextColors(null);
       }
     } catch (error) {
       console.error('Failed to load background settings:', error);
@@ -62,6 +66,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
       setLoading(true);
       const newBackground = await BackgroundService.refreshBackgroundIfNeeded();
       setBackgroundImage(newBackground);
+      updateTextColors(newBackground);
     } catch (error) {
       console.error('Failed to refresh background:', error);
     } finally {
@@ -74,6 +79,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
       setLoading(true);
       const newBackground = await BackgroundService.forceRefreshBackground();
       setBackgroundImage(newBackground);
+      updateTextColors(newBackground);
     } catch (error) {
       console.error('Failed to refresh background:', error);
     } finally {
