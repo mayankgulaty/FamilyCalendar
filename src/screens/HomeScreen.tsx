@@ -91,7 +91,7 @@ export default function HomeScreen() {
     <DynamicBackground 
       refreshTrigger={backgroundRefreshTrigger}
     >
-        {/* Remove container wrapper to test */}
+      <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>

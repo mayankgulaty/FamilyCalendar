@@ -218,7 +218,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                 <View style={styles.eventsContainer}>
                   {dateEvents.slice(0, 3).map((event, eventIndex) => {
                     // Calculate available space and adjust event height
-                    const availableHeight = 160 - 28 - 2 - 6 - 6; // Total - header - margin - padding
+                    const availableHeight = 180 - 28 - 2 - 6 - 6; // Total - header - margin - padding
                     const eventSpacing = 3;
                     const maxEventHeight = Math.floor((availableHeight - (eventSpacing * 2)) / 3); // Divide by 3 events max
                     
@@ -288,10 +288,10 @@ const styles = StyleSheet.create({
   },
   topSection: {
     position: 'absolute',
-    top: 120,
-    left: 12,
-    right: 12,
-    height: 80,
+    top: 140,
+    left: 10,
+    right: 10,
+    height: 70,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -300,56 +300,56 @@ const styles = StyleSheet.create({
   timeDateSection: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 14,
-    padding: 10,
-    marginRight: 4,
-    height: 60,
+    borderRadius: 12,
+    padding: 8,
+    marginRight: 3,
+    height: 50,
     justifyContent: 'center',
   },
   weatherSection: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 14,
-    padding: 8,
-    marginLeft: 4,
-    height: 60,
+    borderRadius: 12,
+    padding: 6,
+    marginLeft: 3,
+    height: 50,
     justifyContent: 'center',
   },
   timeText: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 6,
-    lineHeight: 28,
+    lineHeight: 24,
   },
   dateText: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'white',
     fontWeight: '500',
     textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
-    marginTop: 1,
-    lineHeight: 13,
+    marginTop: 0,
+    lineHeight: 12,
   },
   currentWeather: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 1,
+    marginBottom: 0,
   },
   temperature: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
-    marginRight: 3,
+    marginRight: 2,
   },
   feelsLike: {
-    fontSize: 7,
+    fontSize: 6,
     color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 1,
+    marginTop: 0,
   },
   forecast: {
     flexDirection: 'row',
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: height * 0.82,
+    height: height * 0.85,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   },
   dateCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 160,
+    minHeight: 180,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   },
   emptyCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 160,
+    minHeight: 180,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
