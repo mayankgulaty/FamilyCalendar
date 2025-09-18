@@ -12,6 +12,7 @@ import { useApp } from '../contexts/AppContext';
 import { useTextColors } from '../contexts/TextColorContext';
 import CalendarView from '../components/CalendarView';
 import WeeklyView from '../components/WeeklyView';
+import WallCalendarView from '../components/WallCalendarView';
 import WidgetManager from '../components/WidgetManager';
 import ICalImportModal from '../components/ICalImport';
 import DynamicBackground from '../components/DynamicBackground';
@@ -24,7 +25,7 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
   const { state, dispatch } = useApp();
   const { textColors } = useTextColors();
-  const [currentView, setCurrentView] = useState<'calendar' | 'weekly' | 'dashboard'>('calendar');
+  const [currentView, setCurrentView] = useState<'calendar' | 'weekly' | 'wallcalendar' | 'dashboard'>('wallcalendar');
   const [icalModalVisible, setIcalModalVisible] = useState(false);
   const [backgroundModalVisible, setBackgroundModalVisible] = useState(false);
   const [backgroundSettings, setBackgroundSettings] = useState<BackgroundSettings | null>(null);
@@ -109,16 +110,16 @@ export default function HomeScreen() {
             >
               <Ionicons name="cloud-download" size={20} color={textColors.secondary} />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => setCurrentView(currentView === 'calendar' ? 'dashboard' : 'calendar')}
-            >
-                <Ionicons 
-                  name={currentView === 'calendar' ? 'grid' : 'calendar'} 
-                  size={20} 
-                  color={textColors.secondary} 
-                />
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={() => setCurrentView(currentView === 'dashboard' ? 'calendar' : 'dashboard')}
+                >
+                    <Ionicons 
+                      name="grid" 
+                      size={20} 
+                      color={textColors.secondary}
+                    />
+                </TouchableOpacity>
           </View>
         </View>
 
@@ -132,6 +133,11 @@ export default function HomeScreen() {
         <WeeklyView
           onEventPress={handleEventPress}
         />
+      ) : currentView === 'wallcalendar' ? (
+        <WallCalendarView
+          onEventPress={handleEventPress}
+          onDatePress={handleDatePress}
+        />
       ) : (
         <WidgetManager
           onEventPress={handleEventPress}
@@ -142,13 +148,31 @@ export default function HomeScreen() {
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <TouchableOpacity
+          style={[styles.navItem, currentView === 'wallcalendar' && styles.navItemActive]}
+          onPress={() => setCurrentView('wallcalendar')}
+        >
+          <Ionicons 
+            name="home" 
+            size={24} 
+            color={currentView === 'wallcalendar' ? '#333333' : textColors.secondary}
+          />
+          <Text style={[
+            styles.navLabel, 
+            currentView === 'wallcalendar' && styles.navLabelActive,
+            { color: currentView === 'wallcalendar' ? '#333333' : textColors.secondary }
+          ]}>
+            Wall
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={[styles.navItem, currentView === 'calendar' && styles.navItemActive]}
           onPress={() => setCurrentView('calendar')}
         >
           <Ionicons 
             name="calendar" 
             size={24} 
-                  color={currentView === 'calendar' ? '#333333' : textColors.secondary}
+            color={currentView === 'calendar' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
@@ -166,7 +190,7 @@ export default function HomeScreen() {
           <Ionicons 
             name="calendar-outline" 
             size={24} 
-                  color={currentView === 'weekly' ? '#333333' : textColors.secondary}
+            color={currentView === 'weekly' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
@@ -176,7 +200,7 @@ export default function HomeScreen() {
             Week
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.navItem, currentView === 'dashboard' && styles.navItemActive]}
           onPress={() => setCurrentView('dashboard')}
@@ -184,7 +208,7 @@ export default function HomeScreen() {
           <Ionicons 
             name="grid" 
             size={24} 
-                  color={currentView === 'dashboard' ? '#333333' : textColors.secondary}
+            color={currentView === 'dashboard' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
@@ -255,23 +279,26 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
+    justifyContent: 'space-around',
     backgroundColor: 'transparent',
     borderTopWidth: 1,
     borderTopColor: 'rgba(229, 231, 235, 0.5)',
     paddingBottom: 20,
     paddingTop: 8,
+    paddingHorizontal: 5,
     backdropFilter: 'blur(10px)',
   },
   navItem: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
+    minWidth: 60,
   },
   navItemActive: {
     // Active state styling handled by text/icon colors
   },
   navLabel: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#9ca3af',
     marginTop: 4,
     fontWeight: '500',
