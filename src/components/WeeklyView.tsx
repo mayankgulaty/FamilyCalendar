@@ -190,7 +190,7 @@ export default function WeeklyView({ onEventPress }: WeeklyViewProps) {
     <View style={styles.container}>
       {/* Header */}
       <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
+        colors={['rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.5)']}
         style={styles.header}
       >
         <View style={styles.headerContent}>
@@ -249,8 +249,8 @@ export default function WeeklyView({ onEventPress }: WeeklyViewProps) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refreshAllCalendars}
-            colors={['#6366f1']}
-            tintColor="#6366f1"
+            colors={['#666666']}
+            tintColor="#666666"
           />
         }
       >
@@ -295,7 +295,7 @@ export default function WeeklyView({ onEventPress }: WeeklyViewProps) {
                         key={event.id}
                         style={[
                           styles.eventCard,
-                          { borderLeftColor: event.color || '#6366f1' }
+                          { borderLeftColor: event.color || '#666666' }
                         ]}
                         onPress={() => handleEventPress(event)}
                       >
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
   },
   todayHeader: {
-    backgroundColor: '#6366f1',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },

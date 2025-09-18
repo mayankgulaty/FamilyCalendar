@@ -148,12 +148,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="calendar" 
             size={24} 
-            color={currentView === 'calendar' ? '#6366f1' : textColors.secondary} 
+                  color={currentView === 'calendar' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
             currentView === 'calendar' && styles.navLabelActive,
-            { color: currentView === 'calendar' ? '#6366f1' : textColors.secondary }
+            { color: currentView === 'calendar' ? '#333333' : textColors.secondary }
           ]}>
             Calendar
           </Text>
@@ -166,12 +166,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="calendar-outline" 
             size={24} 
-            color={currentView === 'weekly' ? '#6366f1' : textColors.secondary} 
+                  color={currentView === 'weekly' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
             currentView === 'weekly' && styles.navLabelActive,
-            { color: currentView === 'weekly' ? '#6366f1' : textColors.secondary }
+            { color: currentView === 'weekly' ? '#333333' : textColors.secondary }
           ]}>
             Week
           </Text>
@@ -184,12 +184,12 @@ export default function HomeScreen() {
           <Ionicons 
             name="grid" 
             size={24} 
-            color={currentView === 'dashboard' ? '#6366f1' : textColors.secondary} 
+                  color={currentView === 'dashboard' ? '#333333' : textColors.secondary}
           />
           <Text style={[
             styles.navLabel, 
             currentView === 'dashboard' && styles.navLabelActive,
-            { color: currentView === 'dashboard' ? '#6366f1' : textColors.secondary }
+            { color: currentView === 'dashboard' ? '#333333' : textColors.secondary }
           ]}>
             Dashboard
           </Text>
@@ -277,6 +277,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   navLabelActive: {
-    color: '#6366f1',
+    color: '#333333',
   },
 });
