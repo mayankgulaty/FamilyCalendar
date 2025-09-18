@@ -145,7 +145,6 @@ export default function HomeScreen() {
           onEventAdded={handleEventAdded}
         />
       )}
-      </View>
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
@@ -220,6 +219,7 @@ export default function HomeScreen() {
             Dashboard
           </Text>
         </TouchableOpacity>
+      </View>
       </View>
 
       {/* iCal Import Modal */}
