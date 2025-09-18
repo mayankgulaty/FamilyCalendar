@@ -105,9 +105,11 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
   const dynamicStyles = StyleSheet.create({
     container: {
       flex: 1,
+      width: '100%',
     },
     calendarSection: {
       flex: 1,
+      width: '100%',
       backgroundColor: 'rgba(0, 0, 0, 0.85)',
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,

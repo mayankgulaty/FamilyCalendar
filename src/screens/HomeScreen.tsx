@@ -246,12 +246,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingTop: 50,
@@ -283,6 +285,7 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    width: '100%',
     backgroundColor: 'transparent',
     borderTopWidth: 1,
     borderTopColor: 'rgba(229, 231, 235, 0.5)',

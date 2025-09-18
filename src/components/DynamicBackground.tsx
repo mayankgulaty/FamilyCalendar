@@ -171,6 +171,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
   },
   defaultContainer: {
     flex: 1,
