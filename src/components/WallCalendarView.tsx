@@ -213,42 +213,50 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
 
                 {/* Events for this date */}
                 <View style={styles.eventsContainer}>
-                  {dateEvents.slice(0, 4).map((event, eventIndex) => (
-                    <TouchableOpacity
-                      key={event.id}
-                      style={[
-                        styles.eventSquare, 
-                        { 
-                          borderLeftColor: event.color || '#6366f1',
-                          marginBottom: eventIndex < 3 ? 4 : 0
-                        }
-                      ]}
-                      onPress={() => handleEventPress(event)}
-                    >
-                      <Text style={styles.eventTime}>
-                        {event.allDay 
-                          ? 'All Day' 
-                          : event.startDate.toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true
-                            })
-                        }
-                      </Text>
-                      <Text style={styles.eventTitle} numberOfLines={1}>
-                        {event.title}
-                      </Text>
-                      {event.location && (
-                        <Text style={styles.eventLocation} numberOfLines={1}>
-                          {event.location}
+                  {dateEvents.slice(0, 3).map((event, eventIndex) => {
+                    // Calculate available space and adjust event height
+                    const availableHeight = 160 - 28 - 2 - 6 - 6; // Total - header - margin - padding
+                    const eventSpacing = 3;
+                    const maxEventHeight = Math.floor((availableHeight - (eventSpacing * 2)) / 3); // Divide by 3 events max
+                    
+                    return (
+                      <TouchableOpacity
+                        key={event.id}
+                        style={[
+                          styles.eventSquare, 
+                          { 
+                            borderLeftColor: event.color || '#6366f1',
+                            marginBottom: eventIndex < 2 ? eventSpacing : 0,
+                            height: Math.max(24, maxEventHeight)
+                          }
+                        ]}
+                        onPress={() => handleEventPress(event)}
+                      >
+                        <Text style={styles.eventTime}>
+                          {event.allDay 
+                            ? 'All Day' 
+                            : event.startDate.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })
+                          }
                         </Text>
-                      )}
-                    </TouchableOpacity>
-                  ))}
-                  {dateEvents.length > 4 && (
-                    <View style={styles.moreEvents}>
+                        <Text style={styles.eventTitle} numberOfLines={1}>
+                          {event.title}
+                        </Text>
+                        {event.location && maxEventHeight > 30 && (
+                          <Text style={styles.eventLocation} numberOfLines={1}>
+                            {event.location}
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                  {dateEvents.length > 3 && (
+                    <View style={[styles.moreEvents, { height: 20 }]}>
                       <Text style={styles.moreEventsText}>
-                        +{dateEvents.length - 4} more
+                        +{dateEvents.length - 3} more
                       </Text>
                     </View>
                   )}
@@ -387,17 +395,17 @@ const styles = StyleSheet.create({
   },
   dateCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 140,
+    minHeight: 160,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    padding: 8,
+    padding: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
     justifyContent: 'flex-start',
   },
   emptyCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 140,
+    minHeight: 160,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.05)',
@@ -410,10 +418,10 @@ const styles = StyleSheet.create({
     borderRightWidth: 0,
   },
   dateHeader: {
-    height: 32,
+    height: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   dateNumber: {
     alignItems: 'center',
@@ -460,7 +468,7 @@ const styles = StyleSheet.create({
   eventSquare: {
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 4,
-    padding: 5,
+    padding: 4,
     borderLeftWidth: 3,
     borderLeftColor: '#6366f1',
     shadowColor: '#000',
@@ -468,26 +476,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 1,
     elevation: 1,
-    minHeight: 28,
+    minHeight: 24,
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   eventTime: {
-    fontSize: 9,
+    fontSize: 8,
     color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 1,
+    marginBottom: 0,
     fontWeight: '500',
   },
   eventTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     color: 'white',
-    marginBottom: 1,
-    lineHeight: 13,
+    marginBottom: 0,
+    lineHeight: 12,
   },
   eventLocation: {
-    fontSize: 8,
+    fontSize: 7,
     color: 'rgba(255, 255, 255, 0.6)',
-    lineHeight: 10,
+    lineHeight: 9,
   },
   moreEvents: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
