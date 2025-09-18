@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Platform } from 'react-native';
+import { View, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Platform, Text } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BackgroundService, BackgroundImage, BackgroundSettings } from '../services/backgroundService';
 
@@ -15,6 +15,8 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
   const [settings, setSettings] = useState<BackgroundSettings | null>(null);
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
+  
+  console.log('DynamicBackground render - enabled:', settings?.enabled, 'image:', !!backgroundImage, 'error:', imageError, 'loading:', loading);
 
   useEffect(() => {
     loadBackgroundSettings();
@@ -108,6 +110,11 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
   
   return (
     <View style={styles.container}>
+      {/* Debug indicator */}
+      <View style={styles.debugIndicator}>
+        <Text style={styles.debugText}>BG: {backgroundImage.url.substring(0, 30)}...</Text>
+      </View>
+      
       <ImageBackground
         source={{ uri: backgroundImage.url }}
         style={styles.backgroundImage}
@@ -190,5 +197,19 @@ const styles = StyleSheet.create({
   },
   fallbackBackground: {
     backgroundColor: '#f8fafc',
+  },
+  debugIndicator: {
+    position: 'absolute',
+    top: 50,
+    left: 10,
+    backgroundColor: 'rgba(255, 0, 0, 0.8)',
+    padding: 5,
+    borderRadius: 5,
+    zIndex: 1000,
+  },
+  debugText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
