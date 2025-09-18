@@ -113,40 +113,43 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
 
   return (
     <View style={styles.container}>
-      {/* Time and Date Overlay */}
-      <View style={styles.timeDateOverlay}>
-        <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-        <Text style={styles.dateText}>{formatDate(currentTime)}</Text>
-      </View>
-
-      {/* Weather Widget Overlay */}
-      <View style={styles.weatherOverlay}>
-        <View style={styles.currentWeather}>
-          <Text style={styles.temperature}>49°</Text>
-          <Ionicons name="cloudy" size={24} color="white" />
-          <Text style={styles.feelsLike}>Feels like 40°</Text>
+      {/* Top Section - Time/Date and Weather */}
+      <View style={styles.topSection}>
+        {/* Time and Date Section */}
+        <View style={styles.timeDateSection}>
+          <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+          <Text style={styles.dateText}>{formatDate(currentTime)}</Text>
         </View>
-        
-        <View style={styles.forecast}>
-          <View style={styles.forecastDay}>
-            <Text style={styles.forecastLabel}>Today</Text>
-            <Ionicons name="rainy" size={16} color="white" />
-            <Text style={styles.forecastTemp}>49 40</Text>
+
+        {/* Weather Section */}
+        <View style={styles.weatherSection}>
+          <View style={styles.currentWeather}>
+            <Text style={styles.temperature}>49°</Text>
+            <Ionicons name="cloudy" size={24} color="white" />
+            <Text style={styles.feelsLike}>Feels like 40°</Text>
           </View>
-          <View style={styles.forecastDay}>
-            <Text style={styles.forecastLabel}>Wed</Text>
-            <Ionicons name="rainy" size={16} color="white" />
-            <Text style={styles.forecastTemp}>49 39</Text>
-          </View>
-          <View style={styles.forecastDay}>
-            <Text style={styles.forecastLabel}>Thu</Text>
-            <Ionicons name="sunny" size={16} color="white" />
-            <Text style={styles.forecastTemp}>56 36</Text>
-          </View>
-          <View style={styles.forecastDay}>
-            <Text style={styles.forecastLabel}>Fri</Text>
-            <Ionicons name="sunny" size={16} color="white" />
-            <Text style={styles.forecastTemp}>63 38</Text>
+          
+          <View style={styles.forecast}>
+            <View style={styles.forecastDay}>
+              <Text style={styles.forecastLabel}>Today</Text>
+              <Ionicons name="rainy" size={16} color="white" />
+              <Text style={styles.forecastTemp}>49 40</Text>
+            </View>
+            <View style={styles.forecastDay}>
+              <Text style={styles.forecastLabel}>Wed</Text>
+              <Ionicons name="rainy" size={16} color="white" />
+              <Text style={styles.forecastTemp}>49 39</Text>
+            </View>
+            <View style={styles.forecastDay}>
+              <Text style={styles.forecastLabel}>Thu</Text>
+              <Ionicons name="sunny" size={16} color="white" />
+              <Text style={styles.forecastTemp}>56 36</Text>
+            </View>
+            <View style={styles.forecastDay}>
+              <Text style={styles.forecastLabel}>Fri</Text>
+              <Ionicons name="sunny" size={16} color="white" />
+              <Text style={styles.forecastTemp}>63 38</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -283,11 +286,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  timeDateOverlay: {
+  topSection: {
     position: 'absolute',
-    top: 80,
+    top: 60,
     left: 24,
+    right: 24,
+    height: 120,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     zIndex: 10,
+  },
+  timeDateSection: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 20,
+    padding: 24,
+    marginRight: 12,
+    minHeight: 100,
+    justifyContent: 'center',
+  },
+  weatherSection: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 20,
+    padding: 20,
+    marginLeft: 12,
+    minHeight: 100,
+    justifyContent: 'center',
   },
   timeText: {
     fontSize: 42,
@@ -306,29 +332,22 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
     marginTop: 6,
   },
-  weatherOverlay: {
-    position: 'absolute',
-    top: 80,
-    right: 24,
-    zIndex: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 16,
-    padding: 16,
-    minWidth: 130,
-  },
   currentWeather: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   temperature: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
+    marginRight: 8,
   },
   feelsLike: {
-    fontSize: 12,
+    fontSize: 11,
     color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 4,
+    marginTop: 2,
   },
   forecast: {
     flexDirection: 'row',
@@ -353,7 +372,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: height * 0.8,
+    height: height * 0.75,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
