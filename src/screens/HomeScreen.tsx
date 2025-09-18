@@ -13,7 +13,10 @@ import CalendarView from '../components/CalendarView';
 import WeeklyView from '../components/WeeklyView';
 import WidgetManager from '../components/WidgetManager';
 import ICalImportModal from '../components/ICalImport';
+import DynamicBackground from '../components/DynamicBackground';
+import BackgroundSettingsModal from '../components/BackgroundSettingsModal';
 import { CalendarEvent } from '../types';
+import { BackgroundSettings } from '../services/backgroundService';
 
 const { width } = Dimensions.get('window');
 
@@ -21,6 +24,8 @@ export default function HomeScreen() {
   const { state, dispatch } = useApp();
   const [currentView, setCurrentView] = useState<'calendar' | 'weekly' | 'dashboard'>('calendar');
   const [icalModalVisible, setIcalModalVisible] = useState(false);
+  const [backgroundModalVisible, setBackgroundModalVisible] = useState(false);
+  const [backgroundSettings, setBackgroundSettings] = useState<BackgroundSettings | null>(null);
 
   const handleEventPress = (event: CalendarEvent) => {
     Alert.alert(
@@ -61,32 +66,48 @@ export default function HomeScreen() {
     dispatch({ type: 'SET_SELECTED_DATE', payload: date });
   };
 
+  const handleBackgroundSettingsChange = (settings: BackgroundSettings) => {
+    setBackgroundSettings(settings);
+  };
+
+  const handleBackgroundRefresh = () => {
+    // Force re-render of DynamicBackground
+    setBackgroundSettings({ ...backgroundSettings } as BackgroundSettings);
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.headerTitle}>Family Calendar</Text>
+    <DynamicBackground onBackgroundLoaded={handleBackgroundRefresh}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.headerTitle}>Family Calendar</Text>
+          </View>
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => setBackgroundModalVisible(true)}
+            >
+              <Ionicons name="image" size={20} color="#6b7280" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => setIcalModalVisible(true)}
+            >
+              <Ionicons name="cloud-download" size={20} color="#6b7280" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => setCurrentView(currentView === 'calendar' ? 'dashboard' : 'calendar')}
+            >
+              <Ionicons 
+                name={currentView === 'calendar' ? 'grid' : 'calendar'} 
+                size={20} 
+                color="#6b7280" 
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => setIcalModalVisible(true)}
-          >
-            <Ionicons name="cloud-download" size={20} color="#6b7280" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => setCurrentView(currentView === 'calendar' ? 'dashboard' : 'calendar')}
-          >
-            <Ionicons 
-              name={currentView === 'calendar' ? 'grid' : 'calendar'} 
-              size={20} 
-              color="#6b7280" 
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Content */}
       <View style={styles.content}>
@@ -169,14 +190,23 @@ export default function HomeScreen() {
           setIcalModalVisible(false);
         }}
       />
-    </View>
+
+      {/* Background Settings Modal */}
+      <BackgroundSettingsModal
+        visible={backgroundModalVisible}
+        onClose={() => setBackgroundModalVisible(false)}
+        onSettingsChange={handleBackgroundSettingsChange}
+        onBackgroundRefresh={handleBackgroundRefresh}
+      />
+      </View>
+    </DynamicBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
@@ -185,9 +215,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingTop: 50,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: 'rgba(229, 231, 235, 0.5)',
+    backdropFilter: 'blur(10px)',
   },
   headerLeft: {
     flex: 1,
@@ -211,11 +242,12 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: 'rgba(229, 231, 235, 0.5)',
     paddingBottom: 20,
     paddingTop: 8,
+    backdropFilter: 'blur(10px)',
   },
   navItem: {
     flex: 1,
