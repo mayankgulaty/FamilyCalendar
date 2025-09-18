@@ -87,7 +87,7 @@ export default function HomeScreen() {
     <DynamicBackground 
       refreshTrigger={backgroundRefreshTrigger}
     >
-      <View style={styles.container}>
+      {/* Remove container wrapper to test */}
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -208,7 +208,6 @@ export default function HomeScreen() {
         onSettingsChange={handleBackgroundSettingsChange}
         onBackgroundRefresh={handleBackgroundRefresh}
       />
-      </View>
     </DynamicBackground>
   );
 }
