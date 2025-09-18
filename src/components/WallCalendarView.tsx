@@ -18,7 +18,7 @@ interface WallCalendarViewProps {
   onDatePress: (date: Date) => void;
 }
 
-const { width, height } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function WallCalendarView({ onEventPress, onDatePress }: WallCalendarViewProps) {
   const { state, dispatch } = useApp();
@@ -26,6 +26,16 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventModalVisible, setEventModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [dimensions, setDimensions] = useState({ width: screenWidth, height: screenHeight });
+
+  // Listen for orientation changes
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setDimensions({ width: window.width, height: window.height });
+    });
+
+    return () => subscription?.remove();
+  }, []);
 
 
   // Get current month dates only
@@ -88,11 +98,47 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
   const today = new Date();
   const todayEvents = getEventsForDate(today);
 
+  // Calculate responsive values
+  const isLandscape = dimensions.width > dimensions.height;
+  const cellHeight = isLandscape ? Math.max(120, dimensions.height * 0.15) : Math.max(180, dimensions.height * 0.12);
+  
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    calendarSection: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingTop: 20,
+      paddingHorizontal: 16,
+    },
+    dateCell: {
+      width: '14.28%', // 100% / 7 days
+      minHeight: cellHeight,
+      borderRightWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.15)',
+      padding: 6,
+      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+      justifyContent: 'flex-start',
+    },
+    emptyCell: {
+      width: '14.28%', // 100% / 7 days
+      minHeight: cellHeight,
+      borderRightWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: 'rgba(255, 255, 255, 0.05)',
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    },
+  });
+
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
 
       {/* Calendar Section */}
-      <View style={styles.calendarSection}>
+      <View style={dynamicStyles.calendarSection}>
         {/* Month Header */}
         <View style={styles.monthHeader}>
           <Text style={styles.monthText}>
@@ -112,7 +158,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
           {monthDates.map((date, index) => {
             // Skip empty cells (null dates)
             if (!date) {
-              return <View key={index} style={styles.emptyCell} />;
+              return <View key={index} style={dynamicStyles.emptyCell} />;
             }
             
             const isToday = date.toDateString() === today.toDateString();
@@ -122,7 +168,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
             
             return (
               <View key={index} style={[
-                styles.dateCell,
+                dynamicStyles.dateCell,
                 isLastRow && styles.lastRowCell,
                 isLastColumn && styles.lastColumnCell
               ]}>
@@ -155,7 +201,7 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
                 <View style={styles.eventsContainer}>
                   {dateEvents.slice(0, 3).map((event, eventIndex) => {
                     // Calculate available space and adjust event height
-                    const availableHeight = 180 - 28 - 2 - 6 - 6; // Total - header - margin - padding
+                    const availableHeight = cellHeight - 28 - 2 - 6 - 6; // Total - header - margin - padding
                     const eventSpacing = 3;
                     const maxEventHeight = Math.floor((availableHeight - (eventSpacing * 2)) / 3); // Divide by 3 events max
                     
