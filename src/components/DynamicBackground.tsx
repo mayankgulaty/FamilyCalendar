@@ -107,7 +107,7 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
 
   
   return (
-    <View style={[styles.container, { backgroundColor: '#ff0000' }]}>
+    <View style={styles.container}>
       <ImageBackground
         source={{ uri: backgroundImage.url }}
         style={styles.backgroundImage}
@@ -126,7 +126,23 @@ export default function DynamicBackground({ children, refreshTrigger }: DynamicB
           setImageError(false);
         }}
       >
-        {/* Temporarily disable all overlays to test background visibility */}
+        {/* Blur overlay */}
+        {Platform.OS !== 'web' && settings.blur > 0 && (
+          <BlurView
+            intensity={settings.blur}
+            style={styles.blurOverlay}
+          />
+        )}
+        
+        {/* Web blur fallback */}
+        {Platform.OS === 'web' && settings.blur > 0 && (
+          <View style={[styles.blurOverlay, { backdropFilter: `blur(${settings.blur}px)` }]} />
+        )}
+
+        {/* Opacity overlay */}
+        {settings.opacity < 1 && (
+          <View style={[styles.overlay, { backgroundColor: `rgba(255, 255, 255, ${1 - settings.opacity})` }]} />
+        )}
 
         <View style={styles.content}>
           {children}
@@ -157,7 +173,7 @@ const styles = StyleSheet.create({
   },
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'transparent',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
