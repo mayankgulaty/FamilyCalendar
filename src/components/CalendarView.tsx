@@ -12,6 +12,7 @@ import { Calendar, DateData } from 'react-native-calendars';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
+import { useTextColors } from '../contexts/TextColorContext';
 import { CalendarEvent } from '../types';
 import EventDetailsModal from './EventDetailsModal';
 
@@ -24,6 +25,7 @@ const { width } = Dimensions.get('window');
 
 export default function CalendarView({ onEventPress, onDatePress }: CalendarViewProps) {
   const { state, dispatch } = useApp();
+  const { textColors } = useTextColors();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventModalVisible, setEventModalVisible] = useState(false);
@@ -166,17 +168,17 @@ export default function CalendarView({ onEventPress, onDatePress }: CalendarView
             theme={{
               backgroundColor: 'transparent',
               calendarBackground: 'transparent',
-              textSectionTitleColor: '#6b7280',
+              textSectionTitleColor: textColors.secondary,
               selectedDayBackgroundColor: '#6366f1',
               selectedDayTextColor: '#ffffff',
               todayTextColor: '#6366f1',
-              dayTextColor: '#1f2937',
-              textDisabledColor: '#d1d5db',
+              dayTextColor: textColors.primary,
+              textDisabledColor: textColors.secondary,
               dotColor: '#6366f1',
               selectedDotColor: '#ffffff',
               arrowColor: '#6366f1',
-              disabledArrowColor: '#d1d5db',
-              monthTextColor: '#1f2937',
+              disabledArrowColor: textColors.secondary,
+              monthTextColor: textColors.primary,
               indicatorColor: '#6366f1',
               textDayFontWeight: '500',
               textMonthFontWeight: 'bold',

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
+import { useTextColors } from '../contexts/TextColorContext';
 import { Widget } from '../types';
 import WeatherWidget from '../widgets/WeatherWidget';
 import QuickAddWidget from '../widgets/QuickAddWidget';
@@ -29,6 +30,7 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export default function WidgetManager({ onEventPress, onEventAdded }: WidgetManagerProps) {
   const { state, dispatch } = useApp();
+  const { textColors } = useTextColors();
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 

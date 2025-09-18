@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../contexts/AppContext';
+import { useTextColors } from '../contexts/TextColorContext';
 import { CalendarEvent } from '../types';
 import EventDetailsModal from './EventDetailsModal';
 import { fetchICalData, parseICalData } from '../utils/icalParser';
@@ -23,6 +24,7 @@ const { width } = Dimensions.get('window');
 
 export default function WeeklyView({ onEventPress }: WeeklyViewProps) {
   const { state, dispatch } = useApp();
+  const { textColors } = useTextColors();
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventModalVisible, setEventModalVisible] = useState(false);

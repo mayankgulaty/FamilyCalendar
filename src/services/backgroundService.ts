@@ -38,6 +38,8 @@ function analyzeImageColors(imageUrl: string): Promise<{ isDark: boolean; textCo
     // Even IDs tend to be brighter, odd IDs tend to be darker
     const isDark = imageId % 2 === 1 || imageId > 500;
     
+    console.log('Color analysis for image', imageId, ':', { isDark, textColor: isDark ? '#ffffff' : '#1f2937' });
+    
     const textColor = isDark ? '#ffffff' : '#1f2937';
     const secondaryTextColor = isDark ? '#e5e7eb' : '#6b7280';
     
