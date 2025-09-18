@@ -247,6 +247,7 @@ export class BackgroundService {
     try {
       const settings = await this.getBackgroundSettings();
       const newBackground = await this.fetchNewBackground(settings.category);
+      console.log('Force refreshed background with color analysis:', newBackground);
       return newBackground;
     } catch (error) {
       console.error('Failed to force refresh background:', error);

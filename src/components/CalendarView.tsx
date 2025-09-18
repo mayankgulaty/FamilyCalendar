@@ -121,31 +121,6 @@ export default function CalendarView({ onEventPress, onDatePress }: CalendarView
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
-        style={styles.header}
-      >
-        <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigateMonth('prev')}
-        >
-          <Ionicons name="chevron-back" size={24} color="white" />
-        </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>
-          {currentMonth.toLocaleDateString('en-US', { 
-            month: 'long', 
-            year: 'numeric' 
-          })}
-        </Text>
-        
-        <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigateMonth('next')}
-        >
-          <Ionicons name="chevron-forward" size={24} color="white" />
-        </TouchableOpacity>
-      </LinearGradient>
 
       <ScrollView
         style={styles.scrollContainer}
