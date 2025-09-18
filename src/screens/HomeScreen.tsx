@@ -77,7 +77,7 @@ export default function HomeScreen() {
     try {
       const newBackground = await BackgroundService.forceRefreshBackground();
       console.log('Background refreshed from HomeScreen:', newBackground);
-      setBackgroundRefreshTrigger(prev => prev + 1); // Trigger refresh
+      // Don't trigger refresh here to avoid infinite loop
     } catch (error) {
       console.error('Failed to refresh background from HomeScreen:', error);
     }
@@ -85,7 +85,6 @@ export default function HomeScreen() {
 
   return (
     <DynamicBackground 
-      onBackgroundLoaded={handleBackgroundRefresh}
       refreshTrigger={backgroundRefreshTrigger}
     >
       <View style={styles.container}>

@@ -5,13 +5,12 @@ import { BackgroundService, BackgroundImage, BackgroundSettings } from '../servi
 
 interface DynamicBackgroundProps {
   children: React.ReactNode;
-  onBackgroundLoaded?: (image: BackgroundImage | null) => void;
   refreshTrigger?: number; // Add refresh trigger prop
 }
 
 const { width, height } = Dimensions.get('window');
 
-export default function DynamicBackground({ children, onBackgroundLoaded, refreshTrigger }: DynamicBackgroundProps) {
+export default function DynamicBackground({ children, refreshTrigger }: DynamicBackgroundProps) {
   const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
   const [settings, setSettings] = useState<BackgroundSettings | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +23,7 @@ export default function DynamicBackground({ children, onBackgroundLoaded, refres
 
   // Listen for refresh trigger changes
   useEffect(() => {
-    if (refreshTrigger) {
+    if (refreshTrigger && refreshTrigger > 0) {
       console.log('Refresh trigger changed, reloading background settings...');
       loadBackgroundSettings();
       checkAndRefreshBackground();
@@ -42,9 +41,9 @@ export default function DynamicBackground({ children, onBackgroundLoaded, refres
         const currentBackground = await BackgroundService.getCurrentBackground();
         console.log('Current background:', currentBackground);
         setBackgroundImage(currentBackground);
-        onBackgroundLoaded?.(currentBackground);
       } else {
         console.log('Background is disabled');
+        setBackgroundImage(null);
       }
     } catch (error) {
       console.error('Failed to load background settings:', error);
@@ -62,7 +61,6 @@ export default function DynamicBackground({ children, onBackgroundLoaded, refres
       setLoading(true);
       const newBackground = await BackgroundService.refreshBackgroundIfNeeded();
       setBackgroundImage(newBackground);
-      onBackgroundLoaded?.(newBackground);
     } catch (error) {
       console.error('Failed to refresh background:', error);
     } finally {
@@ -75,7 +73,6 @@ export default function DynamicBackground({ children, onBackgroundLoaded, refres
       setLoading(true);
       const newBackground = await BackgroundService.forceRefreshBackground();
       setBackgroundImage(newBackground);
-      onBackgroundLoaded?.(newBackground);
     } catch (error) {
       console.error('Failed to refresh background:', error);
     } finally {
