@@ -14,6 +14,7 @@ export interface BackgroundImage {
   author: string;
   downloadUrl: string;
   timestamp: number;
+  fallbackUrls?: string[];
 }
 
 const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // You'll need to get this from Unsplash
@@ -126,19 +127,29 @@ export class BackgroundService {
       // For demo purposes, we'll use a fallback service since Unsplash requires API key
       // In production, you'd use: https://api.unsplash.com/photos/random
       
-      // Using Lorem Picsum as a free alternative
+      // Using Lorem Picsum as a free alternative with fallback
       const width = 1080;
       const height = 1920;
       const imageId = Math.floor(Math.random() * 1000);
       
+      // Try multiple fallback URLs
+      const fallbackUrls = [
+        `https://picsum.photos/${width}/${height}?random=${imageId}`,
+        `https://source.unsplash.com/${width}x${height}/?${category}`,
+        `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=${width}&h=${height}&fit=crop`,
+        `https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=${width}&h=${height}&fit=crop`,
+      ];
+      
       const backgroundImage: BackgroundImage = {
         id: `picsum-${imageId}`,
-        url: `https://picsum.photos/${width}/${height}?random=${imageId}`,
+        url: fallbackUrls[0], // Use first URL as primary
         author: 'Lorem Picsum',
-        downloadUrl: `https://picsum.photos/${width}/${height}?random=${imageId}`,
+        downloadUrl: fallbackUrls[0],
         timestamp: Date.now(),
+        fallbackUrls: fallbackUrls.slice(1), // Store fallbacks
       };
 
+      console.log('Fetching background image:', backgroundImage.url);
       await this.saveCurrentBackground(backgroundImage);
       return backgroundImage;
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { View, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { BackgroundService, BackgroundImage, BackgroundSettings } from '../services/backgroundService';
 
@@ -14,6 +14,7 @@ export default function DynamicBackground({ children, onBackgroundLoaded }: Dyna
   const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
   const [settings, setSettings] = useState<BackgroundSettings | null>(null);
   const [loading, setLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     loadBackgroundSettings();
@@ -22,13 +23,18 @@ export default function DynamicBackground({ children, onBackgroundLoaded }: Dyna
 
   const loadBackgroundSettings = async () => {
     try {
+      console.log('Loading background settings...');
       const backgroundSettings = await BackgroundService.getBackgroundSettings();
+      console.log('Background settings loaded:', backgroundSettings);
       setSettings(backgroundSettings);
       
       if (backgroundSettings.enabled) {
         const currentBackground = await BackgroundService.getCurrentBackground();
+        console.log('Current background:', currentBackground);
         setBackgroundImage(currentBackground);
         onBackgroundLoaded?.(currentBackground);
+      } else {
+        console.log('Background is disabled');
       }
     } catch (error) {
       console.error('Failed to load background settings:', error);
@@ -37,6 +43,12 @@ export default function DynamicBackground({ children, onBackgroundLoaded }: Dyna
 
   const checkAndRefreshBackground = async () => {
     try {
+      const backgroundSettings = await BackgroundService.getBackgroundSettings();
+      if (!backgroundSettings.enabled) {
+        setBackgroundImage(null);
+        return;
+      }
+      
       setLoading(true);
       const newBackground = await BackgroundService.refreshBackgroundIfNeeded();
       setBackgroundImage(newBackground);
@@ -70,18 +82,50 @@ export default function DynamicBackground({ children, onBackgroundLoaded }: Dyna
     );
   }
 
+  // If image failed to load, show fallback
+  if (imageError) {
+    return (
+      <View style={styles.container}>
+        <View style={[styles.backgroundImage, styles.fallbackBackground]}>
+          <View style={styles.content}>
+            {children}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground
         source={{ uri: backgroundImage.url }}
         style={styles.backgroundImage}
         resizeMode="cover"
+        onError={(error) => {
+          console.error('Failed to load background image:', error);
+          setImageError(true);
+          // Try fallback URLs if available
+          if (backgroundImage.fallbackUrls && backgroundImage.fallbackUrls.length > 0) {
+            console.log('Trying fallback URL:', backgroundImage.fallbackUrls[0]);
+            // For now, just log the fallback. In a real app, you'd retry with fallback
+          }
+        }}
+        onLoad={() => {
+          console.log('Background image loaded successfully');
+        }}
       >
-        {settings.blur > 0 && (
+        {settings.blur > 0 && Platform.OS !== 'web' && (
           <BlurView
             intensity={settings.blur}
             style={[styles.blurOverlay, { opacity: settings.opacity }]}
           />
+        )}
+        
+        {settings.blur > 0 && Platform.OS === 'web' && (
+          <View style={[styles.blurOverlay, { 
+            backgroundColor: `rgba(0, 0, 0, ${settings.opacity * 0.5})`,
+            backdropFilter: `blur(${settings.blur / 10}px)`
+          }]} />
         )}
         
         {!settings.blur && (
@@ -131,5 +175,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  fallbackBackground: {
+    backgroundColor: '#f8fafc',
   },
 });
