@@ -6,11 +6,12 @@ import { BackgroundService, BackgroundImage, BackgroundSettings } from '../servi
 interface DynamicBackgroundProps {
   children: React.ReactNode;
   onBackgroundLoaded?: (image: BackgroundImage | null) => void;
+  refreshTrigger?: number; // Add refresh trigger prop
 }
 
 const { width, height } = Dimensions.get('window');
 
-export default function DynamicBackground({ children, onBackgroundLoaded }: DynamicBackgroundProps) {
+export default function DynamicBackground({ children, onBackgroundLoaded, refreshTrigger }: DynamicBackgroundProps) {
   const [backgroundImage, setBackgroundImage] = useState<BackgroundImage | null>(null);
   const [settings, setSettings] = useState<BackgroundSettings | null>(null);
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,15 @@ export default function DynamicBackground({ children, onBackgroundLoaded }: Dyna
     loadBackgroundSettings();
     checkAndRefreshBackground();
   }, []);
+
+  // Listen for refresh trigger changes
+  useEffect(() => {
+    if (refreshTrigger) {
+      console.log('Refresh trigger changed, reloading background settings...');
+      loadBackgroundSettings();
+      checkAndRefreshBackground();
+    }
+  }, [refreshTrigger]);
 
   const loadBackgroundSettings = async () => {
     try {

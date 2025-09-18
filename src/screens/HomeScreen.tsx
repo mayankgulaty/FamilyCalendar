@@ -16,7 +16,7 @@ import ICalImportModal from '../components/ICalImport';
 import DynamicBackground from '../components/DynamicBackground';
 import BackgroundSettingsModal from '../components/BackgroundSettingsModal';
 import { CalendarEvent } from '../types';
-import { BackgroundSettings } from '../services/backgroundService';
+import { BackgroundService, BackgroundSettings } from '../services/backgroundService';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +26,7 @@ export default function HomeScreen() {
   const [icalModalVisible, setIcalModalVisible] = useState(false);
   const [backgroundModalVisible, setBackgroundModalVisible] = useState(false);
   const [backgroundSettings, setBackgroundSettings] = useState<BackgroundSettings | null>(null);
+  const [backgroundRefreshTrigger, setBackgroundRefreshTrigger] = useState(0);
 
   const handleEventPress = (event: CalendarEvent) => {
     Alert.alert(
@@ -68,15 +69,25 @@ export default function HomeScreen() {
 
   const handleBackgroundSettingsChange = (settings: BackgroundSettings) => {
     setBackgroundSettings(settings);
+    setBackgroundRefreshTrigger(prev => prev + 1); // Trigger refresh
   };
 
-  const handleBackgroundRefresh = () => {
-    // Force re-render of DynamicBackground
-    setBackgroundSettings({ ...backgroundSettings } as BackgroundSettings);
+  const handleBackgroundRefresh = async () => {
+    // Force refresh the background
+    try {
+      const newBackground = await BackgroundService.forceRefreshBackground();
+      console.log('Background refreshed from HomeScreen:', newBackground);
+      setBackgroundRefreshTrigger(prev => prev + 1); // Trigger refresh
+    } catch (error) {
+      console.error('Failed to refresh background from HomeScreen:', error);
+    }
   };
 
   return (
-    <DynamicBackground onBackgroundLoaded={handleBackgroundRefresh}>
+    <DynamicBackground 
+      onBackgroundLoaded={handleBackgroundRefresh}
+      refreshTrigger={backgroundRefreshTrigger}
+    >
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
