@@ -168,9 +168,15 @@ export default function WallCalendarView({ onEventPress, onDatePress }: WallCale
             const isCurrentMonth = date.getMonth() === currentDate.getMonth();
             const isToday = date.toDateString() === today.toDateString();
             const dateEvents = getEventsForDate(date);
+            const isLastRow = index >= 35; // Last 7 cells (6th row)
+            const isLastColumn = (index + 1) % 7 === 0; // Rightmost column
             
             return (
-              <View key={index} style={styles.dateCell}>
+              <View key={index} style={[
+                styles.dateCell,
+                isLastRow && styles.lastRowCell,
+                isLastColumn && styles.lastColumnCell
+              ]}>
                 {/* Date Number */}
                 <View style={[styles.dateNumber, isToday && styles.todayDateNumber]}>
                   <Text style={[
@@ -257,36 +263,36 @@ const styles = StyleSheet.create({
   },
   timeDateOverlay: {
     position: 'absolute',
-    top: 60,
-    left: 20,
+    top: 80,
+    left: 24,
     zIndex: 10,
   },
   timeText: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: 'bold',
     color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
+    textShadowRadius: 6,
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 18,
     color: 'white',
     fontWeight: '500',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-    marginTop: 4,
+    textShadowRadius: 3,
+    marginTop: 6,
   },
   weatherOverlay: {
     position: 'absolute',
-    top: 60,
-    right: 20,
+    top: 80,
+    right: 24,
     zIndex: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 16,
     padding: 16,
-    minWidth: 120,
+    minWidth: 130,
   },
   currentWeather: {
     alignItems: 'center',
@@ -325,7 +331,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: height * 0.7,
+    height: height * 0.75,
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -334,22 +340,24 @@ const styles = StyleSheet.create({
   },
   monthHeader: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   monthText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: 'white',
   },
   daysOfWeek: {
     flexDirection: 'row',
-    marginBottom: 16,
-    paddingHorizontal: 8,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   dayHeader: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.8)',
     paddingVertical: 8,
@@ -358,30 +366,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     flex: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   dateCell: {
     width: '14.28%', // 100% / 7 days
-    minHeight: 80,
-    padding: 2,
+    minHeight: 100,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+  },
+  lastRowCell: {
+    borderBottomWidth: 0,
+  },
+  lastColumnCell: {
+    borderRightWidth: 0,
   },
   dateNumber: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: 4,
-    borderRadius: 8,
-    marginBottom: 4,
+    borderRadius: 6,
+    marginBottom: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   todayDateNumber: {
     backgroundColor: '#6366f1',
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: 'white',
     textAlign: 'center',
   },
   otherMonthDate: {
-    color: 'rgba(255, 255, 255, 0.4)',
+    color: 'rgba(255, 255, 255, 0.3)',
   },
   todayDateText: {
     color: 'white',
@@ -390,48 +415,59 @@ const styles = StyleSheet.create({
   eventDots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 2,
+    marginLeft: 4,
   },
   eventDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     marginHorizontal: 1,
   },
   eventsContainer: {
     flex: 1,
+    paddingTop: 2,
   },
   eventSquare: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 8,
-    padding: 6,
-    marginBottom: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 6,
     borderLeftWidth: 3,
     borderLeftColor: '#6366f1',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   eventTime: {
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 2,
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 3,
+    fontWeight: '500',
   },
   eventTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     color: 'white',
-    marginBottom: 2,
+    marginBottom: 3,
+    lineHeight: 16,
   },
   eventLocation: {
     fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'rgba(255, 255, 255, 0.7)',
+    lineHeight: 12,
   },
   moreEvents: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 6,
-    padding: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 4,
+    padding: 6,
     alignItems: 'center',
+    marginTop: 2,
   },
   moreEventsText: {
     fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontWeight: '500',
   },
 });
