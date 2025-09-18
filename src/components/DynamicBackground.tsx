@@ -175,12 +175,13 @@ const styles = StyleSheet.create({
   },
   defaultContainer: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#f8fafc',
   },
   backgroundImage: {
     flex: 1,
-    width: width,
-    height: height,
+    width: '100%',
+    height: '100%',
   },
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
